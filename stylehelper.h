@@ -29,6 +29,9 @@ public:
 
     //MapSettings
     QString static getMapSettingsStyle();
+
+    //MapStatistic
+    QString static getMapStatisticStyle();
 private:
     QString static darkBgTop;
     QString static darkBgRight;

@@ -119,7 +119,6 @@ protected:
     QPointF getPointDistansTextPoliline(PoliLine* path);
 
     QTreeWidget* statistic;
-    QTreeWidgetItem* lastTreeItem;
 };
 
 #endif // MAPSCENE_H

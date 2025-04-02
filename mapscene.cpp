@@ -42,6 +42,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 pointCount ++;
 
                 statistic->clear();
+
             }else if(startPointFlag && !finishPointFlag){
                 point->setSettings(KPNumColor, KPColor, KPNumSize, KPSize, KPWidth, KPNumStyle, StartSize,
                                    StartWidth, StartColor, LineWidth, LineColor);
@@ -90,7 +91,6 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 QTreeWidgetItem* treeItem = new QTreeWidgetItem;
                 treeItem->setText(0, ((pointCount == 2? "Старт": QString::number(pointCount - 2)) + "->" + QString::number(pointCount - 1)));
                 statistic->addTopLevelItem(treeItem);
-                lastTreeItem = treeItem;
 
             }else{
                 qDebug() << "??";
@@ -104,6 +104,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
             connect(point, &MapControlPoint::movePointSignal, this, &MapScene::movePointSlot);
             point->setNumberKP(pointCount - 1);
+            point->setPointNum(pointCount - 1);
 
         }else if(currentToolType == ToolType::Ruler){
             if(poliline != nullptr){
@@ -196,10 +197,12 @@ void MapScene::setStatistic(QTreeWidget *newStatistic)
 
 void MapScene::endRuler()
 {
+
     for(int i = 0; i < polilineVec.count(); i++){
         polilineVec[i]->hide();
         polilineTextvec[i]->hide();
     }
+
     QList<QGraphicsItem*> lst = this->items();
     for(int i = 0; i < lst.size(); i++){
         if(lst[i] == mapItem){
@@ -291,7 +294,7 @@ void MapScene::finishRulerMode()
     qDebug() << poliline->getStartPoint()->scenePos();
     if(qPow(qAbs(lastPoint.x() - poliline->getFinishPoint()->scenePos().x()), 2) +
         qPow(qAbs(lastPoint.y() - poliline->getFinishPoint()->scenePos().y()), 2) <=
-        KPSize * KPSize  / 4){
+        KPSize * KPSize  / 4 && poliline != nullptr){
         qDebug() << "FinishRuler";
         path.setElementPositionAt(path.elementCount() - 1, poliline->getFinishPoint()->scenePos().x(), poliline->getFinishPoint()->scenePos().y());
         poliline->setPath(path);
@@ -307,7 +310,18 @@ void MapScene::finishRulerMode()
         textItem->setFont(font);
         textItem->setBrush(QBrush(KPNumColor));
         textItem->setText(QString::number(static_cast<int>(poliline->calculateDistance())));
-    }else{
+
+        polilineTextvec.push_back(textItem);
+
+        int number = poliline->getStartPoint()->getPointNum();
+        qDebug() << "Number: "<< number;
+
+        QTreeWidgetItem* topTreeItem = statistic->topLevelItem(number);
+        QTreeWidgetItem* childTreeItem = new QTreeWidgetItem;
+        childTreeItem->setText(0, QString::number(topTreeItem->childCount() + 1) + " маршрут: " + QString::number(static_cast<int>(poliline->calculateDistance())) + "м");
+        topTreeItem->addChild(childTreeItem);
+
+    }else if(poliline != nullptr){
         polilineVec.pop_back();
         delete poliline;
     }
@@ -359,7 +373,7 @@ void MapScene::setFinishPoint()
     qDebug() << "count: "<< lastItem->childItems().count();
     this->removeItem(lastItem->childItems()[0]);
     lastItem->update();
-    lastTreeItem->setText(0, (QString::number(pointCount - 2) + "->" + "Финиш"));
+    statistic->topLevelItem(pointCount - 2)->setText(0, (QString::number(pointCount - 2) + "->" + "Финиш"));
 }
 
 void MapScene::removeMapPointSlot(MapControlPoint *point)

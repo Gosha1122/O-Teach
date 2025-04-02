@@ -193,6 +193,16 @@ QPoint MapControlPoint::minPoint(QPoint p1, QPoint p2, QPoint p3)
     }
 }
 
+int MapControlPoint::getPointNum() const
+{
+    return pointNum;
+}
+
+void MapControlPoint::setPointNum(int newPointNum)
+{
+    pointNum = newPointNum;
+}
+
 void MapControlPoint::setColorAlphaFlag(bool newColorAlphaFlag)
 {
     colorAlphaFlag = newColorAlphaFlag;

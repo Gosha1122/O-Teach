@@ -212,6 +212,8 @@ Widget::Widget(QWidget *parent)
 
     StyleHelper::setToolButtonStyleDark(ui->addNewMapButton, StyleHelper::MapIconsType::Add,false);
     connect(mapScene, &MapScene::startRulerModeSignal, this, &Widget::startRulerModeSlot);
+
+    ui->TreeStatisticWidget->setStyleSheet(StyleHelper::getMapStatisticStyle());
 }
 
 Widget::~Widget()

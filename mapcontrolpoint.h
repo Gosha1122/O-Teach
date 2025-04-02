@@ -49,6 +49,12 @@ public:
 
     void setNumberKP(int num);
 
+    int getPointNumber() const;
+    void setPointNumber(int newPointNumber);
+
+    int getPointNum() const;
+    void setPointNum(int newPointNum);
+
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -91,6 +97,7 @@ private:
 
     QGraphicsSimpleTextItem* number;
 
+    int pointNum;
 };
 
 

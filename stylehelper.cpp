@@ -311,3 +311,8 @@ QString StyleHelper::getMapSettingsStyle()
             "}";
 }
 
+QString StyleHelper::getMapStatisticStyle()
+{
+    return "";
+}
+
