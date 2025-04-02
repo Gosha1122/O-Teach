@@ -179,3 +179,5 @@ void MapSettings::on_pushButton_6_clicked()
 
 }
 
+
+

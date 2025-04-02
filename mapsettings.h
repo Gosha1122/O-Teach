@@ -23,6 +23,7 @@ public:
     explicit MapSettings(QWidget *parent = nullptr);
     ~MapSettings();
 
+
 private slots:
     void on_addButton_clicked();
     void on_cancellButton_clicked();
@@ -50,6 +51,8 @@ private:
     QGraphicsSimpleTextItem* pointText;
 
     qreal metrOnePixel = 5.0;
+
+
 };
 
 #endif // MAPSETTINGS_H

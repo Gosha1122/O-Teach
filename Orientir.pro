@@ -18,7 +18,6 @@ SOURCES += \
     maplinekp.cpp \
     mapscene.cpp \
     mapsettings.cpp \
-    maptext.cpp \
     mapview.cpp \
     poliline.cpp \
     stylehelper.cpp \
@@ -34,7 +33,6 @@ HEADERS += \
     maplinekp.h \
     mapscene.h \
     mapsettings.h \
-    maptext.h \
     mapview.h \
     poliline.h \
     stylehelper.h \

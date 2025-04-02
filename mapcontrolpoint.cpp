@@ -3,7 +3,6 @@
 #include <QMenu>
 #include "mapscene.h"
 #include "maplinekp.h"
-#include "maptext.h"
 #include <QGraphicsSimpleTextItem>
 
 MapControlPoint::MapControlPoint(QObject *parent)

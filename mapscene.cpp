@@ -4,7 +4,7 @@
 #include "poliline.h"
 #include <QMenu>
 #include "maplinekp.h"
-#include "maptext.h"
+#include <QGraphicsSimpleTextItem>
 
 MapScene::MapScene(QObject *parent)
     : QGraphicsScene{parent}
@@ -40,6 +40,8 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 */
                 emit addStartPointSignal();
                 pointCount ++;
+
+                statistic->clear();
             }else if(startPointFlag && !finishPointFlag){
                 point->setSettings(KPNumColor, KPColor, KPNumSize, KPSize, KPWidth, KPNumStyle, StartSize,
                                    StartWidth, StartColor, LineWidth, LineColor);
@@ -84,6 +86,11 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 font.setPixelSize(KPNumSize);
                 textItem->setFont(font);
                 textItem->setBrush(QBrush(KPNumColor));
+
+                QTreeWidgetItem* treeItem = new QTreeWidgetItem;
+                treeItem->setText(0, ((pointCount == 2? "Старт": QString::number(pointCount - 2)) + "->" + QString::number(pointCount - 1)));
+                statistic->addTopLevelItem(treeItem);
+                lastTreeItem = treeItem;
 
             }else{
                 qDebug() << "??";
@@ -164,14 +171,41 @@ void MapScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 }
 
+QPointF MapScene::getPointDistansTextPoliline(PoliLine* path)
+{
+    qDebug() << "bounding: " << path->boundingRect();
+    qreal min_y = mapItem->boundingRect().height() + 1;
+    qreal x = -1;
+    for(int i = 1; i < path->path().elementCount() - 1; i++){
+        qDebug() << "y: " << path->path().elementAt(i).y;
+        if(min_y > path->path().elementAt(i).y){
+            min_y = path->path().elementAt(i).y;
+            x = path->path().elementAt(i).x;
+        }
+    }
+    if(x == -1){
+        return QPointF((path->path().elementAt(0).y + path->path().elementAt(1).y) / 2, (path->path().elementAt(0).x + path->path().elementAt(1).x) / 2);
+    }
+    return QPointF(x, min_y);
+}
+
+void MapScene::setStatistic(QTreeWidget *newStatistic)
+{
+    statistic = newStatistic;
+}
+
 void MapScene::endRuler()
 {
     for(int i = 0; i < polilineVec.count(); i++){
         polilineVec[i]->hide();
+        polilineTextvec[i]->hide();
     }
     QList<QGraphicsItem*> lst = this->items();
     for(int i = 0; i < lst.size(); i++){
         if(lst[i] == mapItem){
+            continue;
+        }
+        if(lst[i]->parentItem() != nullptr){
             continue;
         }
         MapControlPoint* mapPoint = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
@@ -220,6 +254,10 @@ void MapScene::startRulerMode(MapControlPoint *mp)
         if(lst[i] == mapItem){
             continue;
         }
+        if(lst[i]->parentItem() != nullptr){
+            lst[i]->show();
+            continue;
+        }
         MapControlPoint* item = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
         if(item == mp){
             continue;
@@ -235,15 +273,6 @@ void MapScene::startRulerMode(MapControlPoint *mp)
             color.setAlpha(100);
             item->setColorPoint(color);
             item->setColorAlphaFlag(false);
-            item->update();
-        }else if(item->objectName() == "MapText"){
-            MapText* text = qgraphicsitem_cast<MapText*>(lst[i]);
-            QColor color = text->pen().color();
-            color.setAlpha(100);
-            QPen pen = text->pen();
-            pen.setColor(color);
-            text->setPen(pen);
-            text->setOriginColorFlag(false);
             item->update();
         }
     }
@@ -266,16 +295,30 @@ void MapScene::finishRulerMode()
         qDebug() << "FinishRuler";
         path.setElementPositionAt(path.elementCount() - 1, poliline->getFinishPoint()->scenePos().x(), poliline->getFinishPoint()->scenePos().y());
         poliline->setPath(path);
+
+        QGraphicsSimpleTextItem* textItem = new QGraphicsSimpleTextItem(qgraphicsitem_cast<QGraphicsItem*>(poliline));
+
+        //QPointF p((poliline->getFinishPoint()->pos().x() + poliline->getStartPoint()->pos().x()) / 2, (poliline->getFinishPoint()->pos().y() + poliline->getStartPoint()->pos().y()) / 2);
+        QPointF p = getPointDistansTextPoliline(poliline);
+
+        textItem->setPos(p.x() - KPNumSize - 10, p.y() - KPNumSize - 10);
+        QFont font = textItem->font();
+        font.setPixelSize(KPNumSize * 2 / 3);
+        textItem->setFont(font);
+        textItem->setBrush(QBrush(KPNumColor));
+        textItem->setText(QString::number(static_cast<int>(poliline->calculateDistance())));
     }else{
         polilineVec.pop_back();
         delete poliline;
     }
-    qDebug() << poliline->calculateDistance();
     poliline = nullptr;
     qDebug() << polilineVec.count();
     QList<QGraphicsItem*> lst = this->items();
     for(int i = 0; i < lst.count(); i++){
         if(lst[i] == mapItem){
+            continue;
+        }
+        if(lst[i]->parentItem() != nullptr){
             continue;
         }
         MapControlPoint* mapPoint = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
@@ -285,10 +328,6 @@ void MapScene::finishRulerMode()
         }else if(mapPoint->objectName() == "Point"){
             mapPoint->setColorAlphaFlag(true);
             mapPoint->update();
-        }else if(mapPoint->objectName() == "MapText"){
-            MapText* text = qgraphicsitem_cast<MapText*>(lst[i]);
-            text->setOriginColorFlag(true);
-            text->update();
         }
     }
 }
@@ -305,6 +344,10 @@ void MapScene::setMapItem(QGraphicsItem *newMapItem)
 
 void MapScene::setFinishPoint()
 {
+    if(pointCount <= 2){
+        this->deletePoints();
+        return;
+    }
     lastItem->setShape(MapControlPoint::Finish);
     if(flagLastItemStart){
         lastItem->getStartLine()->setFlagStartPoint(MapLineKP::StartPoint::beginAndEndStartPoint);
@@ -314,8 +357,9 @@ void MapScene::setFinishPoint()
     lastItem->getStartLine()->setRStart(StartSize / 2);
     lastItem->getStartLine()->updateKP();
     qDebug() << "count: "<< lastItem->childItems().count();
-    delete lastItem->childItems()[0];
+    this->removeItem(lastItem->childItems()[0]);
     lastItem->update();
+    lastTreeItem->setText(0, (QString::number(pointCount - 2) + "->" + "Финиш"));
 }
 
 void MapScene::removeMapPointSlot(MapControlPoint *point)
@@ -457,6 +501,8 @@ void MapScene::deletePoints()
     pointCount = 0;
     startPointFlag = false;
     finishPointFlag = false;
+
+    statistic->clear();
     emit removeAllMapPointsSignal();
 }
 

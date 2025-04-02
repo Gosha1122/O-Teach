@@ -4,8 +4,10 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QTreeWidget>
 class MapControlPoint;
 class PoliLine;
+class QGraphicsSimpleTextItem;
 
 class MapScene : public QGraphicsScene
 {
@@ -62,6 +64,8 @@ public:
 
     void endRuler();
 
+    void setStatistic(QTreeWidget *newStatistic);
+
 private slots:
     void removeMapPointSlot(MapControlPoint* point);
     void moveMapPoitSlot(QPointF oldPos, QPointF newPos);
@@ -106,12 +110,16 @@ protected:
     MapControlPoint * lastItem;
     PoliLine* poliline = nullptr;
     QVector<PoliLine*> polilineVec;
+    QVector<QGraphicsSimpleTextItem*> polilineTextvec;
 
     QPointF oldPoint;
 
     bool flagLastItemStart = false;
 
+    QPointF getPointDistansTextPoliline(PoliLine* path);
 
+    QTreeWidget* statistic;
+    QTreeWidgetItem* lastTreeItem;
 };
 
 #endif // MAPSCENE_H

@@ -395,7 +395,7 @@
               </size>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="tab">
               <attribute name="title">
@@ -803,6 +803,17 @@
               <attribute name="title">
                <string>Статистика</string>
               </attribute>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QTreeWidget" name="TreeStatisticWidget">
+                 <column>
+                  <property name="text">
+                   <string>Перегоны</string>
+                  </property>
+                 </column>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </widget>
            </item>
@@ -901,8 +912,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1190</width>
-            <height>615</height>
+            <width>81</width>
+            <height>16</height>
            </rect>
           </property>
          </widget>

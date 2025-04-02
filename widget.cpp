@@ -131,6 +131,7 @@ Widget::Widget(QWidget *parent)
     mapSizeValue = 100;
     connect(ui->plusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
     connect(ui->minusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
+    mapScene->setStatistic(ui->TreeStatisticWidget);
 
     connect(ui->KPColorButton,    &QPushButton::clicked, this, &Widget::ColorButtonSlot);
     connect(ui->KPNumColorButton, &QPushButton::clicked, this, &Widget::ColorButtonSlot);
