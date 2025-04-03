@@ -119,6 +119,8 @@ protected:
     QPointF getPointDistansTextPoliline(PoliLine* path);
 
     QTreeWidget* statistic;
+
+    void deletePointTreeWidget(int num);
 };
 
 #endif // MAPSCENE_H

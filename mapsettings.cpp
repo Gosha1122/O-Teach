@@ -156,7 +156,11 @@ void MapSettings::updatePointPositonSlot()
 
 void MapSettings::on_pushButton_9_clicked()
 {
-
+    metrOnePixel = ui->metrsSpinBox->value()/pointsLine->line().length();
+    qDebug() << "lenght = " << pointsLine->line().length();
+    qDebug() << "lenght/value=" << pointsLine->line().length() << "/"<< ui->metrsSpinBox->value();
+    qDebug() << "lenght = " << metrOnePixel;
+    pointText->setText(QString::number(ui->metrsSpinBox->value())+" м.");
 }
 
 
@@ -175,8 +179,55 @@ void MapSettings::on_pushButton_6_clicked()
     QString filename = "map" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss");
     originImg->save(dirPath+"/"+filename+"_origin.png");
     prevImg->save(dirPath+"/"+filename+"_small.png");
+    originPath = dirPath+"/"+filename+"_origin.png";
+    prevPath =dirPath+"/"+filename+"_small.png";
+    title = ui->nameEdit->text();
+    sz = ui->sizeEdit->text().toInt();
+    if(!ui->lineEdit->text().trimmed().isEmpty()){
+        pixSize = ui->lineEdit->text().trimmed().toInt();
+    }
     this->accept();
 
+}
+
+QString MapSettings::getPrevPath() const
+{
+    return prevPath;
+}
+
+void MapSettings::setPrevPath(const QString &newPrevPath)
+{
+    prevPath = newPrevPath;
+}
+
+QString MapSettings::getOriginPath() const
+{
+    return originPath;
+}
+
+void MapSettings::setOriginPath(const QString &newOriginPath)
+{
+    originPath = newOriginPath;
+}
+
+QString MapSettings::getDescription() const
+{
+    return description;
+}
+
+void MapSettings::setDescription(const QString &newDescription)
+{
+    description = newDescription;
+}
+
+QString MapSettings::getTitle() const
+{
+    return title;
+}
+
+void MapSettings::setTitle(const QString &newTitle)
+{
+    title = newTitle;
 }
 
 

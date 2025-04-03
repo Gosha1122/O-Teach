@@ -43,6 +43,7 @@ Widget::Widget(QWidget *parent)
 
 
 
+
     QFile output("exmample.xml");
     output.open(QIODevice::WriteOnly |QIODevice::Text);
     QXmlStreamWriter stream(&output);
@@ -122,7 +123,7 @@ Widget::Widget(QWidget *parent)
     mapScene->setBackgroundBrush(QColor(200,200,210));
     ui->mapView->setScene(mapScene);
 
-    QPixmap pix(":/resourses/maps/map2.jpg");
+    QPixmap pix(":/resourses/maps/map5.jpg");
     QGraphicsPixmapItem* imageItem = new QGraphicsPixmapItem(pix);
 
     ui->mapView->setSceneRect(0,0,pix.width(), pix.height());
@@ -180,14 +181,35 @@ Widget::Widget(QWidget *parent)
 
     grid = new QGridLayout;
     ui->scrollAreaWidgetContents->setLayout(grid);
-    for(int i=0;i<8;i++){
-        MapIconButton* iconBtn = new MapIconButton;
-        iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
-        iconBtn->setFixedSize(320,280);
-        grid->addWidget(iconBtn, i/4, i%4);
-        connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
+    MapIconButton* iconBtn = new MapIconButton;
+    iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+    iconBtn->setFixedSize(320,280);
+    iconBtn->setData("Открытый кубок Пермского края", "", ":/resourses/maps/map1.png",":/resourses/maps/map1-s.png",1000,20);
+    grid->addWidget(iconBtn, 0, 0);
+    connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
 
-    }
+    MapIconButton* iconBtn2 = new MapIconButton;
+    iconBtn2->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+    iconBtn2->setFixedSize(320,280);
+    iconBtn2->setData("A-Zel Series", "", ":/resourses/maps/map2.jpg",":/resourses/maps/map2-s.png",1000,20);
+    grid->addWidget(iconBtn2, 0, 1);
+    connect(iconBtn2, &MapIconButton::openMap, this, &Widget::openMapSlot);
+
+    MapIconButton* iconBtn3 = new MapIconButton;
+    iconBtn3->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+    iconBtn3->setFixedSize(320,280);
+    iconBtn3->setData("Покровский остров", "", ":/resourses/maps/map3.jpg",":/resourses/maps/map3-s.png",1000,20);
+    grid->addWidget(iconBtn3, 0, 2);
+    connect(iconBtn3, &MapIconButton::openMap, this, &Widget::openMapSlot);
+
+    MapIconButton* iconBtn4 = new MapIconButton;
+    iconBtn4->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+    iconBtn4->setFixedSize(320,280);
+    iconBtn4->setData("Легенда Адыгеи", "", ":/resourses/maps/map5.jpg",":/resourses/maps/map4-s.png",1000,20);
+    grid->addWidget(iconBtn4, 0, 3);
+    connect(iconBtn4, &MapIconButton::openMap, this, &Widget::openMapSlot);
+
+
 
 
 
@@ -410,6 +432,19 @@ void Widget::endButtonPointSlot()
 void Widget::openMapSlot()
 {
     ui->stackedWidget->setCurrentWidget(ui->mapPage);
+    MapIconButton* btn = qobject_cast<MapIconButton*> (sender());
+    QString originPath = btn->getOrigingPath();
+    QPixmap pix(originPath);
+    QGraphicsPixmapItem* imageItem = new QGraphicsPixmapItem(pix);
+
+    ui->mapView->setSceneRect(0,0,pix.width(), pix.height());
+    QGraphicsItem* item = mapScene->getMapItem();
+    mapScene->removeItem(item);
+    mapScene->setMapItem(imageItem);
+    mapScene->addItem(imageItem);
+    mapSizeValue = 100;
+
+    ui->mapNameLabel->setText(btn->getTitle()+" 1:"+QString::number(btn->getSz()));
 }
 
 void Widget::SizeSpinBoxSlot(int value)
@@ -470,7 +505,19 @@ void Widget::addNewMapButtonSlot()
 {
     MapSettings dlg(this);
     if(dlg.exec()==QDialog::Accepted){
-
+        MapIconButton* iconBtn = new MapIconButton;
+        iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+        iconBtn->setFixedSize(320,280);
+        iconBtn->setData(dlg.getTitle(), "", dlg.getOriginPath(),dlg.getPrevPath(),1000,20);
+        int row = grid->count()-1 / 4;
+        int column = (grid->count()) % 4;
+        if(column == 0){
+            row ++;
+        }
+        qDebug() <<  "count=" << grid->count();
+        qDebug() << row << ":" << column ;
+        grid->addWidget(iconBtn, row, column);
+        connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
     }
 }
 
@@ -486,43 +533,46 @@ void Widget::endButtonRulerSlot()
 
 void Widget::settingsInit()
 {
+    QColor allColor;
+    allColor.setNamedColor("#8e2cff");
     //Номера КП
-    ui->KPNumSpinBox->setValue(30);
-    mapScene->setKPNumSize(30);
+    ui->KPNumSpinBox->setValue(60);
+    mapScene->setKPNumSize(60);
 
     ui->KPNumStyleComboBox->setCurrentIndex(0);
     mapScene->setKPNumStyle(0);
 
-    ui->KPNumColorButton->setProperty("ColorName", "#ff0000");
-    ui->KPNumColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
-    mapScene->setKPNumColor(Qt::red);
+    ui->KPNumColorButton->setProperty("ColorName", "#8e2cff");
+    ui->KPNumColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
+    mapScene->setKPNumColor(allColor);
     //КП
-    ui->KPSizeSpinBox->setValue(40);
-    mapScene->setKPSize(40);
+    ui->KPSizeSpinBox->setValue(180);
+    mapScene->setKPSize(180);
 
-    ui->KPWidthSpinBox->setValue(3);
-    mapScene->setKPWidth(3);
+    ui->KPWidthSpinBox->setValue(10);
+    mapScene->setKPWidth(10);
 
-    ui->KPColorButton->setProperty("ColorName", "#ff0000");
-    ui->KPColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
-    mapScene->setKPColor(Qt::red);
+    ui->KPColorButton->setProperty("ColorName", "#8e2cff");
+    ui->KPColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
+
+    mapScene->setKPColor(allColor);
     //Старт/Финиш
-    ui->StartSizeSpinBox->setValue(40);
-    mapScene->setStartSize(40);
+    ui->StartSizeSpinBox->setValue(180);
+    mapScene->setStartSize(180);
 
-    ui->StartWidthSpinBox->setValue(3);
-    mapScene->setStartWidth(3);
+    ui->StartWidthSpinBox->setValue(10);
+    mapScene->setStartWidth(10);
 
-    ui->StartColorButton->setProperty("ColorName", "#ff0000");
-    ui->StartColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
-    mapScene->setStartColor(Qt::red);
+    ui->StartColorButton->setProperty("ColorName", "#8e2cff");
+    ui->StartColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
+    mapScene->setStartColor(allColor);
     //Линии
-    ui->LineWidthSpinBox->setValue(3);
-    mapScene->setLineWidth(3);
+    ui->LineWidthSpinBox->setValue(10);
+    mapScene->setLineWidth(10);
 
-    ui->LineColorButton->setProperty("ColorName", "#ff0000");
-    ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
-    mapScene->setLineColor(Qt::red);
+    ui->LineColorButton->setProperty("ColorName", "#8e2cff");
+    ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
+    mapScene->setLineColor(allColor);
 
 }
 

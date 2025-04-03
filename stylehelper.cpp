@@ -277,6 +277,13 @@ QString StyleHelper::getMessageBoxStyle()
             "}";
 }
 
+QString StyleHelper::getTreeWidgetStyle()
+{
+    return "QTreeView {"
+           "background:color:#ccc;"
+           "}";
+}
+
 QString StyleHelper::getMapSettingsStyle()
 {
     return "QDialog#MapSettings{"
@@ -308,11 +315,45 @@ QString StyleHelper::getMapSettingsStyle()
             "}"
             "QLineEdit::focus{"
             "background:#fff;"
-            "}";
+            "}"
+            "QPushButton{"
+            "border:none;"
+            "border-radius:3px;"
+            "background-color:#83a6b2;"
+            "color:#eee;"
+            "font-size:14px;"
+            "padding:8px 20px;"
+            "}"
+            "QPushButton:hover{"
+            "background-color:#93b6c2;"
+            "color:#fff;"
+            "}"
+            "QPushButton#addButton,"
+            "QPushButton#pushButton_3,"
+            "QPushButton#pushButton_6{"
+            "background-color:#bfd855;"
+            "color:#627203;"
+            "};";
 }
 
 QString StyleHelper::getMapStatisticStyle()
 {
-    return "";
+    return "QTreeView {"
+           "background-color:"+darkBgRight+";"
+            "border:none;"
+            "color:#D3D3D3;"
+           "}"
+            "QHeaderView::section{"
+            "background-color:"+darkBgRight+";"
+            "border:none;"
+            "color:#D3D3D3;"
+            "font-size:14px;"
+            "}"
+            "QTreeView::item {"
+            "color:#D3D3D3;"
+            "font-size:14px;"
+             "background-color:"+darkBgRight+";"
+            "border:none;"
+            "}";
 }
 

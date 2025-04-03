@@ -190,6 +190,20 @@ QPointF MapScene::getPointDistansTextPoliline(PoliLine* path)
     return QPointF(x, min_y);
 }
 
+void MapScene::deletePointTreeWidget(int num)
+{
+    statistic->takeTopLevelItem(num - 1);
+    qDebug() << "PointCount: " << pointCount - 2;
+    for(int i = num - 1; i < statistic->topLevelItemCount(); i++){
+        statistic->topLevelItem(i)->setText(0, QString::number(i) + "->" + QString::number(i + 1));
+        if(i == statistic->topLevelItemCount() - 1){
+            statistic->topLevelItem(i)->setText(0, QString::number(i) + "->" + "Финиш");
+        }else if(i == 0){
+            statistic->topLevelItem(i)->setText(0, "Старт->1");
+        }
+    }
+}
+
 void MapScene::setStatistic(QTreeWidget *newStatistic)
 {
     statistic = newStatistic;
@@ -378,6 +392,22 @@ void MapScene::setFinishPoint()
 
 void MapScene::removeMapPointSlot(MapControlPoint *point)
 {
+    pointCount--;
+
+    deletePointTreeWidget(point->getPointNum());
+
+    for(int i = 0; i < polilineVec.count(); i++){
+        if(polilineVec[i]->getStartPoint() == point){
+            this->removeItem(polilineVec[i]);
+            polilineVec.remove(i);
+            i--;
+        }else if(polilineVec[i]->getFinishPoint() == point){
+            this->removeItem(polilineVec[i]);
+            polilineVec.remove(i);
+            i--;
+        }
+    }
+
     QList<QGraphicsItem *> lst = this->items();
     /*
     for(int i=lst.size()-1;i>=0;i--){
@@ -469,6 +499,8 @@ void MapScene::removeMapPointSlot(MapControlPoint *point)
     removeItem(point->getStartLine());
     removeItem(point->getFinishLine());
     removeItem(point);
+
+
 }
 
 void MapScene::moveMapPoitSlot(QPointF oldPos, QPointF newPos)
@@ -490,9 +522,9 @@ void MapScene::movePointSlot(MapControlPoint *mp)
     for(int i = 0; i < lst.size(); i++){
         if(lst[i] != mapItem){
             MapControlPoint* mp_1 = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
-            if(mp_1->scenePos() == mp->getStartLine()->getStartPoint()){
+            if(mp->getStartLine() != nullptr && mp_1->scenePos() == mp->getStartLine()->getStartPoint()){
                 mp_1->update();
-            }else if(mp_1->scenePos() == mp->getFinishLine()->getFinishPoint()){
+            }else if(mp->getFinishLine() != nullptr && mp_1->scenePos() == mp->getFinishLine()->getFinishPoint()){
                 mp_1->update();
             }
         }

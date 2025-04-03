@@ -26,6 +26,7 @@ public:
     QString static getSpinBoxStyle();
     QString static getColorButtonStyle(QString color);
     QString static getMessageBoxStyle();
+    QString static getTreeWidgetStyle();
 
     //MapSettings
     QString static getMapSettingsStyle();

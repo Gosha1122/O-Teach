@@ -24,6 +24,19 @@ public:
     ~MapSettings();
 
 
+
+    QString getTitle() const;
+    void setTitle(const QString &newTitle);
+
+    QString getDescription() const;
+    void setDescription(const QString &newDescription);
+
+    QString getOriginPath() const;
+    void setOriginPath(const QString &newOriginPath);
+
+    QString getPrevPath() const;
+    void setPrevPath(const QString &newPrevPath);
+
 private slots:
     void on_addButton_clicked();
     void on_cancellButton_clicked();
@@ -51,6 +64,12 @@ private:
     QGraphicsSimpleTextItem* pointText;
 
     qreal metrOnePixel = 5.0;
+    QString title;
+    QString description;
+    QString originPath;
+    QString prevPath;
+    int sz;
+    int pixSize;
 
 
 };
