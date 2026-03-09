@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileDialog>
+#include <QStandardPaths>
 #include <QPixmap>
 #include <QStandardPaths>
 #include <QDebug>
@@ -110,7 +111,7 @@ void MapSettings::on_cancellButton_clicked()
 
 void MapSettings::on_selectButton_clicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Выбор изображения");
+    QString path = QFileDialog::getOpenFileName(this, "Выбор изображения", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "Images (*.png *.jpg *webr)");
     if(path.isEmpty()){
         return;
     }

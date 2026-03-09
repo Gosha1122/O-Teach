@@ -331,7 +331,7 @@ void Widget::scaleSceneSlot()
         mapSizeValue+=10;
     }else{
 
-        if(mapSizeValue <= 0){
+        if(mapSizeValue <= -200){
             return;
         }
         mapSizeValue-=10;
@@ -344,6 +344,8 @@ void Widget::scaleSceneSlot()
     matrix.rotate(0);
 
     ui->mapView->setTransform(matrix);
+
+    ui->zoomValueLabel->setText(QString::number(static_cast<int>(scale * 100)) + "%");
 }
 
 void Widget::ColorButtonSlot()
@@ -443,6 +445,11 @@ void Widget::openMapSlot()
     mapScene->setMapItem(imageItem);
     mapScene->addItem(imageItem);
     mapSizeValue = 100;
+    QTransform matrix;
+    matrix.scale(1, 1);
+    matrix.rotate(0);
+    ui->mapView->setTransform(matrix);
+    ui->zoomValueLabel->setText("100%");
 
     ui->mapNameLabel->setText(btn->getTitle()+" 1:"+QString::number(btn->getSz()));
 }

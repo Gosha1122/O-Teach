@@ -1,6 +1,7 @@
 #include "mapiconbutton.h"
 #include "ui_mapiconbutton.h"
 #include <QDebug>
+#include <QMenu>
 
 MapIconButton::MapIconButton(QWidget *parent)
     : QFrame(parent)
@@ -29,9 +30,30 @@ void MapIconButton::setData(QString title, QString description, QString originPa
 
 void MapIconButton::mousePressEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
     qDebug() << "Pressed";
-    emit openMap();
+    if(event->button() == Qt::LeftButton){
+        Q_UNUSED(event);
+
+        emit openMap();
+    }else if(event->button() == Qt::RightButton){
+
+    }
+}
+
+void MapIconButton::contextMenuEvent(QContextMenuEvent *event)
+{
+    QFrame::contextMenuEvent(event);
+
+    QMenu menu;
+    QAction* deleteAction = menu.addAction("Удалить");
+    QAction* readyAction = menu.addAction("Выбрать");
+
+    QAction *selectedAction = menu.exec(event->globalPos());
+    if(selectedAction == deleteAction){
+        this->deleteLater();
+    }else if(selectedAction == readyAction ) {
+        emit openMap();
+    }
 }
 
 int MapIconButton::getPixSize() const
