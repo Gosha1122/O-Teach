@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>577</width>
+    <width>590</width>
     <height>420</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
       <pixmap resource="resourses.qrc">:/resourses/icons/step_1.png</pixmap>
      </property>
      <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -40,7 +40,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_1">
       <layout class="QGridLayout" name="gridLayout">
@@ -139,7 +139,7 @@
        <item row="5" column="1" colspan="3">
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -158,7 +158,7 @@
           <string>Описание</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
          </property>
         </widget>
        </item>
@@ -210,7 +210,7 @@
        <item row="1" column="3" colspan="3">
         <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -230,7 +230,7 @@
        <item row="1" column="0">
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -289,7 +289,7 @@
        <item row="0" column="3" colspan="4">
         <spacer name="horizontalSpacer_6">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -305,7 +305,7 @@
        <item row="2" column="0" colspan="4">
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>

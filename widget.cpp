@@ -18,6 +18,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QScreen>
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -40,66 +41,6 @@ Widget::Widget(QWidget *parent)
         QRect rect = QApplication::primaryScreen()->geometry();
         setGeometry(rect.width()/2-w/2, rect.height()/2-h/2, w, h);
     }
-
-
-
-
-    QFile output("exmample.xml");
-    output.open(QIODevice::WriteOnly |QIODevice::Text);
-    QXmlStreamWriter stream(&output);
-    stream.setAutoFormatting(true);
-    stream.writeStartDocument();
-    stream.writeStartElement("maps");
-    stream.writeStartElement("map");
-
-    stream.writeTextElement("title", "Первенство...");
-    stream.writeTextElement("origin", "C:/123/1.png");
-    stream.writeTextElement("small", "C:/123/1small.png");
-    stream.writeTextElement("size", "1000");
-    stream.writeTextElement("metrpx", "10");
-    stream.writeTextElement("description", "sjslkdjfl skdfj\n slkdj\n fklsjdfl");
-    stream.writeEndElement(); // map
-
-    stream.writeStartElement("map");
-    stream.writeTextElement("title", "Чемпионат...");
-    stream.writeTextElement("origin", "C:/123/12.png");
-    stream.writeTextElement("small", "C:/123/12small.png");
-    stream.writeTextElement("size", "10000");
-    stream.writeTextElement("metrpx", "20");
-    stream.writeTextElement("description", "sjs33333lkdjfl skdfj\n slkdj\n fklsjdfl");
-    stream.writeEndElement(); // map
-    stream.writeEndElement(); // maps
-    stream.writeEndDocument();
-    output.close();
-
-
-    QFile file("exmample.xml");
-    file.open(QIODevice::ReadOnly |QIODevice::Text);
-    QXmlStreamReader xmlReader;
-    xmlReader.setDevice(&file);
-    xmlReader.readNext();
-    QString map;
-    while(!xmlReader.atEnd())
-    {
-        if(xmlReader.isStartElement())
-        {
-            if(xmlReader.name().toString()=="map"){
-                if(!map.isEmpty()){
-                    qDebug() << map;
-                }
-                map.clear();
-
-            }else if(xmlReader.name().toString() == "title"){
-                map += xmlReader.readElementText();
-            }
-            else if(xmlReader.name().toString() == "size"){
-                map += xmlReader.readElementText();
-            }
-        }
-        xmlReader.readNext();
-    }
-    qDebug() << map;
-    file.close();
 
 
     StyleHelper::setFonts();
@@ -181,12 +122,15 @@ Widget::Widget(QWidget *parent)
 
     grid = new QGridLayout;
     ui->scrollAreaWidgetContents->setLayout(grid);
+    getSaveMapInit();
+    /*
     MapIconButton* iconBtn = new MapIconButton;
     iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
     iconBtn->setFixedSize(320,280);
     iconBtn->setData("Открытый кубок Пермского края", "", ":/resourses/maps/map1.png",":/resourses/maps/map1-s.png",1000,20);
     grid->addWidget(iconBtn, 0, 0);
     connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
+    ++countMaps;
 
     MapIconButton* iconBtn2 = new MapIconButton;
     iconBtn2->setStyleSheet(StyleHelper::getMapIconButtonStyle());
@@ -194,6 +138,7 @@ Widget::Widget(QWidget *parent)
     iconBtn2->setData("A-Zel Series", "", ":/resourses/maps/map2.jpg",":/resourses/maps/map2-s.png",1000,20);
     grid->addWidget(iconBtn2, 0, 1);
     connect(iconBtn2, &MapIconButton::openMap, this, &Widget::openMapSlot);
+    ++countMaps;
 
     MapIconButton* iconBtn3 = new MapIconButton;
     iconBtn3->setStyleSheet(StyleHelper::getMapIconButtonStyle());
@@ -201,6 +146,7 @@ Widget::Widget(QWidget *parent)
     iconBtn3->setData("Покровский остров", "", ":/resourses/maps/map3.jpg",":/resourses/maps/map3-s.png",1000,20);
     grid->addWidget(iconBtn3, 0, 2);
     connect(iconBtn3, &MapIconButton::openMap, this, &Widget::openMapSlot);
+    ++countMaps;
 
     MapIconButton* iconBtn4 = new MapIconButton;
     iconBtn4->setStyleSheet(StyleHelper::getMapIconButtonStyle());
@@ -208,6 +154,8 @@ Widget::Widget(QWidget *parent)
     iconBtn4->setData("Легенда Адыгеи", "", ":/resourses/maps/map5.jpg",":/resourses/maps/map4-s.png",1000,20);
     grid->addWidget(iconBtn4, 0, 3);
     connect(iconBtn4, &MapIconButton::openMap, this, &Widget::openMapSlot);
+    ++countMaps;
+    */
 
 
 
@@ -251,6 +199,7 @@ void Widget::closeEvent(QCloseEvent *event)
     settings.setValue("window/max",isMaximized());
     settings.setValue("window/height", height());
     settings.setValue("window/width",width());
+    saveMaps();
 }
 
 void Widget::changCurrentToolSlot()
@@ -515,17 +464,19 @@ void Widget::addNewMapButtonSlot()
         MapIconButton* iconBtn = new MapIconButton;
         iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
         iconBtn->setFixedSize(320,280);
-        iconBtn->setData(dlg.getTitle(), "", dlg.getOriginPath(),dlg.getPrevPath(),1000,20);
-        int row = grid->count()-1 / 4;
-        int column = (grid->count()) % 4;
-        if(column == 0){
-            row ++;
-        }
+        QString originPath = dlg.getOriginPath();
+        QString prevPath = dlg.getPrevPath();
+        iconBtn->setData(dlg.getTitle(), dlg.getDescription(), originPath, prevPath, dlg.getSz(), dlg.getPixSize());
         qDebug() <<  "count=" << grid->count();
-        qDebug() << row << ":" << column ;
-        grid->addWidget(iconBtn, row, column);
+        grid->addWidget(iconBtn, (countMaps - countMaps % 5) / 5, countMaps % 5);
         connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
+        ++countMaps;
     }
+}
+
+void Widget::deleteMapButtonSlot(int index)
+{
+    maps.remove(index);
 }
 
 void Widget::endButtonRulerSlot()
@@ -541,7 +492,7 @@ void Widget::endButtonRulerSlot()
 void Widget::settingsInit()
 {
     QColor allColor;
-    allColor.setNamedColor("#8e2cff");
+    allColor.setNamedColor(QString("#8e2cff"));
     //Номера КП
     ui->KPNumSpinBox->setValue(60);
     mapScene->setKPNumSize(60);
@@ -580,6 +531,154 @@ void Widget::settingsInit()
     ui->LineColorButton->setProperty("ColorName", "#8e2cff");
     ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
     mapScene->setLineColor(allColor);
+
+}
+
+void Widget::getSaveMapInit()
+{
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString path = dataPath + "/savemap.xml";
+    QFile saveMapFile(path);
+    if(!saveMapFile.open(QIODevice::ReadOnly |QIODevice::Text)){
+        qDebug() << "Error open saveMap file";
+        return;
+    }
+    QXmlStreamReader reader;
+    reader.setDevice(&saveMapFile);
+    reader.readNext();
+    MapIconButton* map = new MapIconButton;
+
+    while(!reader.atEnd()){
+        if(reader.isStartElement()){
+            QString t = reader.name().toString();
+            if(t == "map"){
+                if(map->isNormal()){
+                    grid->addWidget(map, (countMaps - countMaps % 5) / 5, countMaps % 5);
+                    connect(map, &MapIconButton::openMap, this, &Widget::openMapSlot);
+                    connect(map, &MapIconButton::deleteMap, this, &Widget::deleteMapButtonSlot);
+                    map->setIndex(countMaps);
+                    ++countMaps;
+                    maps.push_back(map);
+                }else{
+                    delete map;
+                }
+                map = new MapIconButton;
+                map->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+                map->setFixedSize(320,280);
+            }else if(t == "title"){
+                map->setTitle(reader.readElementText());
+            }else if(t == "origin"){
+                map->setOrigingPath(reader.readElementText());
+            }else if(t == "small"){
+                map->setPrevPath(reader.readElementText());
+            }else if(t == "size"){
+                map->setSz(reader.readElementText().toInt());
+            }else if(t == "scale"){
+                map->setPixSize(reader.readElementText().toInt());
+            }else if(t == "description"){
+                map->setDescription(reader.readElementText());
+            }
+        }
+        reader.readNext();
+    }
+    if(map->isNormal()){
+        grid->addWidget(map, (countMaps - countMaps % 5) / 5, countMaps % 5);
+        connect(map, &MapIconButton::openMap, this, &Widget::openMapSlot);
+        connect(map, &MapIconButton::deleteMap, this, &Widget::deleteMapButtonSlot);
+        map->setIndex(countMaps);
+        ++countMaps;
+        maps.push_back(map);
+    }else{
+        delete map;
+    }
+    saveMapFile.close();
+    /*
+    QFile file("exmample.xml");
+    file.open(QIODevice::ReadOnly |QIODevice::Text);
+    QXmlStreamReader xmlReader;
+    xmlReader.setDevice(&file);
+    xmlReader.readNext();
+    QString map;
+    while(!xmlReader.atEnd())
+    {
+        if(xmlReader.isStartElement())
+        {
+            if(xmlReader.name().toString()=="map"){
+                if(!map.isEmpty()){
+                    qDebug() << map;
+                }
+                map.clear();
+
+            }else if(xmlReader.name().toString() == "title"){
+                map += xmlReader.readElementText();
+            }
+            else if(xmlReader.name().toString() == "size"){
+                map += xmlReader.readElementText();
+            }
+        }
+        xmlReader.readNext();
+    }
+    qDebug() << map;
+    file.close();
+    */
+}
+
+void Widget::saveMaps()
+{
+    /*
+    QFile output("exmample.xml");
+    output.open(QIODevice::WriteOnly |QIODevice::Text);
+    QXmlStreamWriter stream(&output);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("maps");
+    stream.writeStartElement("map");
+
+    stream.writeTextElement("title", "Первенство...");
+    stream.writeTextElement("origin", "C:/123/1.png");
+    stream.writeTextElement("small", "C:/123/1small.png");
+    stream.writeTextElement("size", "1000");
+    stream.writeTextElement("metrpx", "10");
+    stream.writeTextElement("description", "sjslkdjfl skdfj\n slkdj\n fklsjdfl");
+    stream.writeEndElement(); // map
+
+    stream.writeStartElement("map");
+    stream.writeTextElement("title", "Чемпионат...");
+    stream.writeTextElement("origin", "C:/123/12.png");
+    stream.writeTextElement("small", "C:/123/12small.png");
+    stream.writeTextElement("size", "10000");
+    stream.writeTextElement("metrpx", "20");
+    stream.writeTextElement("description", "sjs33333lkdjfl skdfj\n slkdj\n fklsjdfl");
+    stream.writeEndElement(); // map
+    stream.writeEndElement(); // maps
+    stream.writeEndDocument();
+    output.close();
+    */
+    qDebug() << "saveMaps";
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString path = dataPath + "/savemap.xml";
+    QFile saveMapFile(path);
+    if(!saveMapFile.open(QIODevice::WriteOnly |QIODevice::Text)){
+        qDebug() << "Error open saveMap file";
+        return;
+    }
+    QXmlStreamWriter output(&saveMapFile);
+    output.setAutoFormatting(true);
+    output.writeStartDocument();
+    output.writeStartElement("maps");
+    for(MapIconButton* map: maps){
+        output.writeStartElement("map");
+        output.writeTextElement("title", map->getTitle());
+        output.writeTextElement("origin", map->getOrigingPath());
+        output.writeTextElement("small", map->getPrevPath());
+        output.writeTextElement("size", QString::number(map->getSz()));
+        output.writeTextElement("scale", QString::number(map->getPixSize()));
+        output.writeTextElement("description", map->getDescription());
+        output.writeEndElement();
+    }
+    output.writeEndElement();
+    output.writeEndDocument();
+    saveMapFile.close();
 
 }
 

@@ -16,6 +16,7 @@ public:
     explicit MapIconButton(QWidget *parent = nullptr);
     ~MapIconButton();
     void setData(QString title, QString description, QString originPath, QString prevPath, int size, int pixSize);
+    bool isNormal();
 
     QString getTitle() const;
 
@@ -25,21 +26,42 @@ public:
 
     int getPixSize() const;
 
+    void setTitle(const QString &newTitle);
+
+    void setDescription(const QString &newDescription);
+
+    void setOrigingPath(const QString &newOrigingPath);
+
+    void setPrevPath(const QString &newPrevPath);
+
+    void setSz(int newSz);
+
+    void setPixSize(int newPixSize);
+
+    QString getDescription() const;
+
+    QString getPrevPath() const;
+
+    void setIndex(int newIndex);
+
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
 
 signals:
     void openMap();
+    void deleteMap(int index);
 
 private:
     Ui::MapIconButton *ui;
-    QString title;
-    QString description;
-    QString origingPath;
-    QString prevPath;
-    int sz;
-    int pixSize;
+    QString title = "";
+    QString description = "";
+    QString origingPath = "";
+    QString prevPath = "";
+    int sz = 0;
+    int pixSize = 0;
+
+    int index = -1;
 
 };
 

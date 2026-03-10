@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<maps>
+    <map>
+        <title>Открытый кубок Пермского края</title>
+        <origin>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map1.png</origin>
+        <small>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map1-s.png</small>
+        <size>1000</size>
+        <scale>20</scale>
+        <description></description>
+    </map>
+    <map>
+        <title>A-Zel Series</title>
+        <origin>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map2.jpg</origin>
+        <small>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map2-s.png</small>
+        <size>1000</size>
+        <scale>20</scale>
+        <description></description>
+    </map>
+    <map>
+        <title>Покровский островя</title>
+        <origin>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map3.jpg</origin>
+        <small>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map3-s.png</small>
+        <size>1000</size>
+        <scale>20</scale>
+        <description></description>
+    </map>
+    <map>
+        <title>Легенда Адыгеи</title>
+        <origin>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map5.jpg</origin>
+        <small>C:/Users/Гоша/AppData/Roaming/MySoft/Orientir/maps/map4-s.png</small>
+        <size>1000</size>
+        <scale>20</scale>
+        <description></description>
+    </map>
+</maps>

@@ -6,7 +6,6 @@
 #include "defines.h"
 #include <QCloseEvent>
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class Widget;
@@ -14,6 +13,7 @@ class Widget;
 class QToolButton;
 class QPushButton;
 class QGridLayout;
+class MapIconButton;
 QT_END_NAMESPACE
 
 class Widget : public QWidget
@@ -40,6 +40,7 @@ private slots:
     void setCursorSlot(const QString& str);
     void startRulerModeSlot();
     void addNewMapButtonSlot();
+    void deleteMapButtonSlot(int index);
     void endButtonRulerSlot();
 
 private:
@@ -52,13 +53,16 @@ private:
     QPushButton* endRulerButton;
 
     QGridLayout* grid;
+    int countMaps = 0;
+    QList<MapIconButton*> maps;
 
     MapApl::ToolType toolMode = MapApl::ToolType::Move;
 
     bool endPathButtonHide = true;
 
-
     void settingsInit();
+    void getSaveMapInit();
+    void saveMaps();
     void setRulerMode();
 
 };

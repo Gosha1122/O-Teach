@@ -13,6 +13,7 @@
 #include "stylehelper.h"
 #include <QScreen>
 #include <QIcon>
+#include <QProcess>
 
 MapSettings::MapSettings(QWidget *parent)
     : QDialog(parent)
@@ -89,6 +90,7 @@ void MapSettings::on_addButton_clicked()
     ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_2.png"));
     originImg = new QPixmap;
     QString path = ui->pathEdit->text().trimmed();
+    originPath = path;
     if(originImg->load(path)){
         pixMapItem = new QGraphicsPixmapItem(QPixmap(path));
         pixMapItem->setFlags(QGraphicsItem::ItemIsMovable);
@@ -111,7 +113,7 @@ void MapSettings::on_cancellButton_clicked()
 
 void MapSettings::on_selectButton_clicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Выбор изображения", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "Images (*.png *.jpg *webr)");
+    QString path = QFileDialog::getOpenFileName(this, "Выбор изображения", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "Images (*.png *.jpg *.jpeg *.webr *.webp *.tiff *.bmp *.svg)");
     if(path.isEmpty()){
         return;
     }
@@ -180,8 +182,30 @@ void MapSettings::on_pushButton_6_clicked()
     QString filename = "map" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss");
     originImg->save(dirPath+"/"+filename+"_origin.png");
     prevImg->save(dirPath+"/"+filename+"_small.png");
-    originPath = dirPath+"/"+filename+"_origin.png";
-    prevPath =dirPath+"/"+filename+"_small.png";
+
+    qDebug() << originPath << prevPath;
+
+    QProcess process;
+    QStringList args;
+    QFileInfo info(originPath);
+    args << originPath << dirPath + "/" + filename + ".jpg";
+    process.start("magick.exe", args);
+    if(!process.waitForStarted() || !process.waitForFinished()){
+        qDebug() << "Error start";
+        return;
+    }
+    originPath = args[1];
+
+    info.setFile(prevPath);
+    args.clear();
+    args << originPath << dirPath + "/" + filename + "-s.png";
+    process.start("magick.exe", args);
+    if(!process.waitForStarted() || !process.waitForFinished()){
+        qDebug() << "Error start";
+        return;
+    }
+    prevPath = args[1];
+
     title = ui->nameEdit->text();
     sz = ui->sizeEdit->text().toInt();
     if(!ui->lineEdit->text().trimmed().isEmpty()){
@@ -189,6 +213,16 @@ void MapSettings::on_pushButton_6_clicked()
     }
     this->accept();
 
+}
+
+int MapSettings::getPixSize() const
+{
+    return pixSize;
+}
+
+int MapSettings::getSz() const
+{
+    return sz;
 }
 
 QString MapSettings::getPrevPath() const

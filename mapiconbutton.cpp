@@ -28,6 +28,11 @@ void MapIconButton::setData(QString title, QString description, QString originPa
     ui->headerLabel->setText(title);
 }
 
+bool MapIconButton::isNormal()
+{
+    return !(title == "" && description == "" && origingPath == "" && prevPath == "" && sz == 0 && pixSize == 0);
+}
+
 void MapIconButton::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "Pressed";
@@ -51,9 +56,58 @@ void MapIconButton::contextMenuEvent(QContextMenuEvent *event)
     QAction *selectedAction = menu.exec(event->globalPos());
     if(selectedAction == deleteAction){
         this->deleteLater();
+        emit deleteMap(index);
     }else if(selectedAction == readyAction ) {
         emit openMap();
     }
+}
+
+void MapIconButton::setIndex(int newIndex)
+{
+    index = newIndex;
+}
+
+QString MapIconButton::getPrevPath() const
+{
+    return prevPath;
+}
+
+QString MapIconButton::getDescription() const
+{
+    return description;
+}
+
+void MapIconButton::setPixSize(int newPixSize)
+{
+    pixSize = newPixSize;
+}
+
+void MapIconButton::setSz(int newSz)
+{
+    sz = newSz;
+}
+
+void MapIconButton::setPrevPath(const QString &newPrevPath)
+{
+    prevPath = newPrevPath;
+    ui->imageLabel->setPixmap(QPixmap(prevPath));
+}
+
+void MapIconButton::setOrigingPath(const QString &newOrigingPath)
+{
+    origingPath = newOrigingPath;
+}
+
+void MapIconButton::setDescription(const QString &newDescription)
+{
+    description = newDescription;
+    setToolTip(description);
+}
+
+void MapIconButton::setTitle(const QString &newTitle)
+{
+    title = newTitle;
+    ui->headerLabel->setText(title);
 }
 
 int MapIconButton::getPixSize() const

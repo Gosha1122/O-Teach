@@ -37,6 +37,10 @@ public:
     QString getPrevPath() const;
     void setPrevPath(const QString &newPrevPath);
 
+    int getSz() const;
+
+    int getPixSize() const;
+
 private slots:
     void on_addButton_clicked();
     void on_cancellButton_clicked();
