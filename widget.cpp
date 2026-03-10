@@ -468,6 +468,8 @@ void Widget::addNewMapButtonSlot()
         QString prevPath = dlg.getPrevPath();
         iconBtn->setData(dlg.getTitle(), dlg.getDescription(), originPath, prevPath, dlg.getSz(), dlg.getPixSize());
         qDebug() <<  "count=" << grid->count();
+        iconBtn->setIndex(countMaps);
+        maps.push_back(iconBtn);
         grid->addWidget(iconBtn, (countMaps - countMaps % 5) / 5, countMaps % 5);
         connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
         ++countMaps;

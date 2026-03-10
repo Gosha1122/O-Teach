@@ -126,9 +126,9 @@ void MapSettings::on_pushButton_3_clicked()
     ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_3.png"));
     ui->descriptionLabel->setText("Переместите точки, чтобы указать растояние");
     QPixmap pix;
-    int x = (pixMapItem->x()<0)? abs(pixMapItem->x())+120: 120-pixMapItem->x();
-    int y = (pixMapItem->y()<0)? abs(pixMapItem->y())+50: 50-pixMapItem->y();
-    pix = originImg->copy(x, y, 300,200);
+    xPrev = (pixMapItem->x()<0)? abs(pixMapItem->x())+120: 120-pixMapItem->x();
+    yPrev = (pixMapItem->y()<0)? abs(pixMapItem->y())+50: 50-pixMapItem->y();
+    pix = originImg->copy(xPrev, yPrev, 300,200);
     prevImg = new QPixmap(pix);
     ui->graphicsView_2->setScene(cropScene);
     cropItem->hide();
@@ -180,8 +180,6 @@ void MapSettings::on_pushButton_6_clicked()
     }
     qDebug() << dirPath;
     QString filename = "map" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss");
-    originImg->save(dirPath+"/"+filename+"_origin.png");
-    prevImg->save(dirPath+"/"+filename+"_small.png");
 
     qDebug() << originPath << prevPath;
 
@@ -198,13 +196,13 @@ void MapSettings::on_pushButton_6_clicked()
 
     info.setFile(prevPath);
     args.clear();
-    args << originPath << dirPath + "/" + filename + "-s.png";
+    args << originPath << "-crop" << "300x200+" + QString::number(xPrev) + "+" + QString::number(yPrev) << "+repage" << dirPath + "/" + filename + "-s.png";
     process.start("magick.exe", args);
     if(!process.waitForStarted() || !process.waitForFinished()){
         qDebug() << "Error start";
         return;
     }
-    prevPath = args[1];
+    prevPath = args[4];
 
     title = ui->nameEdit->text();
     sz = ui->sizeEdit->text().toInt();

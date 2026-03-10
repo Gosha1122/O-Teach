@@ -75,7 +75,8 @@ private:
     int sz;
     int pixSize;
 
-
+    int xPrev = 0;
+    int yPrev = 0;
 };
 
 #endif // MAPSETTINGS_H
