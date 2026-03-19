@@ -249,7 +249,7 @@ QString StyleHelper::getSpinBoxStyle()
            "color:#3B4045;"
            "}"
            "QSpinBox::focus{"
-           "background:#fff;"
+           "background:#777;"
            "}";
 }
 
@@ -322,7 +322,7 @@ QString StyleHelper::getMapSettingsStyle()
             "background-color:#83a6b2;"
             "color:#eee;"
             "font-size:14px;"
-            "padding:8px 20px;"
+            "padding:8px 8px 8px 8px;"
             "}"
             "QPushButton:hover{"
             "background-color:#93b6c2;"

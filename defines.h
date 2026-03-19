@@ -35,4 +35,15 @@ enum ToolCursor{
     Default
 };
 }
+
+namespace Fatal{
+
+enum Message{
+    Debug,
+    Warning,
+    Critical,
+    Fatal
+};
+
+};
 #endif // DEFINES_H

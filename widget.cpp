@@ -18,6 +18,8 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QScreen>
+#include <QDateTime>
+#include <QTextStream>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -42,6 +44,10 @@ Widget::Widget(QWidget *parent)
         setGeometry(rect.width()/2-w/2, rect.height()/2-h/2, w, h);
     }
 
+    logger = new Logger;
+    logger->setLogPath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/logs/log_" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss") + ".log");
+    logger->message("Start work", Fatal::Message::Debug);
+
 
     StyleHelper::setFonts();
     ui->mapPage->setStyleSheet(StyleHelper::getMapStyleDark());
@@ -63,6 +69,7 @@ Widget::Widget(QWidget *parent)
     mapScene = new MapScene(this);
     mapScene->setBackgroundBrush(QColor(200,200,210));
     ui->mapView->setScene(mapScene);
+    mapScene->setLogger(logger);
 
     QPixmap pix(":/resourses/maps/map5.jpg");
     QGraphicsPixmapItem* imageItem = new QGraphicsPixmapItem(pix);
@@ -105,6 +112,7 @@ Widget::Widget(QWidget *parent)
     endPathButton->setStyleSheet(StyleHelper::getEndPathButtonStyle());
     endPathButton->hide();
     connect(mapScene, &MapScene::removeAllMapPointsSignal, endPathButton, &QWidget::hide);
+    connect(mapScene, &MapScene::addStartPointSignal, this, [this](){this->endPathMode = false;});
     connect(endPathButton, &QPushButton::clicked, this, &Widget::endButtonPointSlot);
 
     endRulerButton = new QPushButton("Завершить измерения", this);
@@ -200,6 +208,9 @@ void Widget::closeEvent(QCloseEvent *event)
     settings.setValue("window/height", height());
     settings.setValue("window/width",width());
     saveMaps();
+
+    logger->message("Close program", Fatal::Message::Debug);
+    logger->closeFile();
 }
 
 void Widget::changCurrentToolSlot()
@@ -222,9 +233,19 @@ void Widget::changCurrentToolSlot()
         endPathButton->move(10, ui->topPanelWidget->height() + 10);
     }
     currentTool = btn;
+
+    if(!endRulerMode && type != MapIcons::Ruler){
+        endRulerButton->hide();
+        endRulerMode = true;
+        if(!endPathButtonHide){
+            endButtonPointSlot();
+        }
+        mapScene->endRuler();
+    }
+
     switch (type) {
     case MapIcons::Move:
-        qDebug() << "lskjdf";
+        logger->message("Start select move mode", Fatal::Message::Debug);
 
         toolMode = MapApl::ToolType::Move;
 
@@ -233,8 +254,12 @@ void Widget::changCurrentToolSlot()
         ui->mapView->setCursorType();
         ui->mapView->setDragMode(QGraphicsView::ScrollHandDrag);
         mapScene->setCurrentToolType(MapScene::ToolType::Move);
+
+        logger->message("Finish select move mode", Fatal::Message::Debug);
         break;
     case MapIcons::Path:
+
+        logger->message("Start select path mode", Fatal::Message::Debug);
 
         toolMode = MapApl::ToolType::Path;
 
@@ -243,8 +268,12 @@ void Widget::changCurrentToolSlot()
         ui->mapView->setDragMode(QGraphicsView::NoDrag);
         ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Path);
+
+        logger->message("Finish select move mode", Fatal::Message::Debug);
         break;
     case MapIcons::Ruler:
+
+        logger->message("Start select ruler mode", Fatal::Message::Debug);
 
         toolMode = MapApl::ToolType::Ruler;
 
@@ -256,23 +285,33 @@ void Widget::changCurrentToolSlot()
 
         endPathButton->move(10, ui->topPanelWidget->height() + 50);
         endRulerButton->show();
+        mapScene->startRulerModeStart();
+
+        endRulerMode = false;
+
+        logger->message("Finish select ruler mode", Fatal::Message::Debug);
         break;
 
     default:
-
+        logger->message("Start select default mode", Fatal::Message::Debug);
 
         ui->mapView->setToolCursor(Cursors::ToolCursor::Default);
 
         ui->mapView->setDragMode(QGraphicsView::NoDrag);
         ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Default);
+
+        logger->message("Finish select default mode", Fatal::Message::Debug);
     }
+
 
 
 }
 
 void Widget::scaleSceneSlot()
 {
+    logger->message("Start scale(button) scene", Fatal::Message::Debug);
+
     if(sender()->objectName()=="plusButton"){
         if(mapSizeValue >= 200){
             return;
@@ -295,6 +334,8 @@ void Widget::scaleSceneSlot()
     ui->mapView->setTransform(matrix);
 
     ui->zoomValueLabel->setText(QString::number(static_cast<int>(scale * 100)) + "%");
+
+    logger->message("Finish scale(button) scene", Fatal::Message::Debug);
 }
 
 void Widget::ColorButtonSlot()
@@ -359,6 +400,7 @@ void Widget::endPathSlot()
 
 void Widget::backButtonSlot()
 {
+    endRulerButton->click();
     endPathButton->hide();
     endPathButtonHide = true;
     ui->stackedWidget->setCurrentWidget(ui->mapsListPage);
@@ -368,6 +410,7 @@ void Widget::endButtonPointSlot()
 {
     endPathButton->hide();
     endPathButtonHide = true;
+    endPathMode = true;
     if(toolMode == MapApl::ToolType::Path){
         if(mapScene->getPointCount() == 1){
             mapScene->deletePoints();
@@ -380,7 +423,7 @@ void Widget::endButtonPointSlot()
     }
 }
 
-void Widget::openMapSlot()
+void Widget:: openMapSlot()
 {
     ui->stackedWidget->setCurrentWidget(ui->mapPage);
     MapIconButton* btn = qobject_cast<MapIconButton*> (sender());
@@ -393,6 +436,7 @@ void Widget::openMapSlot()
     mapScene->removeItem(item);
     mapScene->setMapItem(imageItem);
     mapScene->addItem(imageItem);
+    imageItem->setZValue(-1);
     mapSizeValue = 100;
     QTransform matrix;
     matrix.scale(1, 1);
@@ -401,6 +445,8 @@ void Widget::openMapSlot()
     ui->zoomValueLabel->setText("100%");
 
     ui->mapNameLabel->setText(btn->getTitle()+" 1:"+QString::number(btn->getSz()));
+
+    if(!endPathMode) endPathButton->show();
 }
 
 void Widget::SizeSpinBoxSlot(int value)
@@ -473,6 +519,7 @@ void Widget::addNewMapButtonSlot()
         grid->addWidget(iconBtn, (countMaps - countMaps % 5) / 5, countMaps % 5);
         connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
         ++countMaps;
+        iconBtn->setLogger(logger);
     }
 }
 
@@ -484,11 +531,13 @@ void Widget::deleteMapButtonSlot(int index)
 void Widget::endButtonRulerSlot()
 {
     endRulerButton->hide();
+    endRulerMode = true;
     if(!endPathButtonHide){
         endButtonPointSlot();
     }
     mapScene->endRuler();
     ui->moveButton->click();
+
 }
 
 void Widget::settingsInit()
@@ -561,6 +610,7 @@ void Widget::getSaveMapInit()
                     map->setIndex(countMaps);
                     ++countMaps;
                     maps.push_back(map);
+                    map->setLogger(logger);
                 }else{
                     delete map;
                 }
@@ -590,6 +640,7 @@ void Widget::getSaveMapInit()
         map->setIndex(countMaps);
         ++countMaps;
         maps.push_back(map);
+        map->setLogger(logger);
     }else{
         delete map;
     }
@@ -688,6 +739,11 @@ void Widget::setRulerMode()
 {
     mapScene->setCurrentToolType(MapScene::ToolType::Ruler);
 }
+
+// void Widget::writeLogFile(QString msg, Fatal::Message type)
+// {
+
+// }
 
 
 

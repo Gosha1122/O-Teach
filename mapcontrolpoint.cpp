@@ -4,6 +4,8 @@
 #include "mapscene.h"
 #include "maplinekp.h"
 #include <QGraphicsSimpleTextItem>
+#include "poliline.h"
+#include <QFile>
 
 MapControlPoint::MapControlPoint(QObject *parent)
     :QObject(parent), QGraphicsItem(nullptr), prevPoint(nullptr)
@@ -132,7 +134,7 @@ void MapControlPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 setFlag(ItemIsMovable);
             }
         }
-    }else if(parentScene->getCurrentToolType() == MapScene::ToolType::Ruler && parentScene->getPoliline() == nullptr){
+    }else if(parentScene->getCurrentToolType() == MapScene::ToolType::Ruler && parentScene->getPoliline() == nullptr && shape != Finish){
         parentScene->startRulerMode(this);
     }
     QGraphicsItem::mousePressEvent(event);
@@ -140,29 +142,45 @@ void MapControlPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MapControlPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(leftButtonPresed){
-        auto dx =  event->scenePos().x()- previousPosition.x();
-        auto dy = event->scenePos().y() - previousPosition.y();
-        QPointF oldPos = this->scenePos();
-        moveBy(dx, dy);
-        //QPointF newPos = this->scenePos();
-        /*
-        setPreviousPosition(event->scenePos());
-        if(dx > 0.5 || dy > 0.5){
-            emit moveMapPoint(oldPos, newPos);
+    if(parentScene->getCurrentToolType() != MapScene::ToolType::Ruler && parentScene->getCurrentToolType() != MapScene::ToolType::Move){
+        if(leftButtonPresed){
+            auto dx = event->scenePos().x() - previousPosition.x();
+            auto dy = event->scenePos().y() - previousPosition.y();
+            QPointF oldPos = this->scenePos();
+            moveBy(dx, dy);
+            //QPointF newPos = this->scenePos();
+            /*
+            setPreviousPosition(event->scenePos());
+            if(dx > 0.5 || dy > 0.5){
+                emit moveMapPoint(oldPos, newPos);
+            }
+            */
+            if(startLine != nullptr){
+                startLine->setRKP(KPSize / 2);
+                startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), oldPos.x(), oldPos.y());
+            }
+            if(finishLine != nullptr){
+                finishLine->setRKP(KPSize / 2);
+                finishLine->setKPLine(oldPos.x(), oldPos.y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+            }
+            if(pfinish != nullptr){
+                QPainterPath path = pfinish->path();
+                path.setElementPositionAt(path.elementCount() - 1, this->scenePos().x() - dx, this->scenePos().y() - dy);
+                pfinish->setPath(path);
+                pfinish->getText()->setText(QString::number(static_cast<int>(pfinish->calculateDistance())));
+            }
+            if(pstart != nullptr){
+                QPainterPath path = pstart->path();
+                path.setElementPositionAt(0, this->scenePos().x() - dx, this->scenePos().y() - dy);
+                pstart->setPath(path);
+                pstart->getText()->setText(QString::number(static_cast<int>(pstart->calculateDistance())));
+            }
+
+            emit movePointSignal(this);
         }
-        */
-        if(startLine != nullptr){
-            startLine->setRKP(KPSize / 2);
-            startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), oldPos.x(), oldPos.y());
-        }
-        if(finishLine != nullptr){
-            finishLine->setRKP(KPSize / 2);
-            finishLine->setKPLine(oldPos.x(), oldPos.y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
-        }
-        emit movePointSignal(this);
+        QGraphicsItem::mouseMoveEvent(event);
     }
-    QGraphicsItem::mouseMoveEvent(event);
+
 }
 
 void MapControlPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -191,6 +209,33 @@ QPoint MapControlPoint::minPoint(QPoint p1, QPoint p2, QPoint p3)
     }else{
         return p1;
     }
+}
+
+void MapControlPoint::setLogger(Logger *newLogger)
+{
+    logger = newLogger;
+}
+
+
+PoliLine *MapControlPoint::getPstart() const
+{
+    return pstart;
+}
+
+void MapControlPoint::setPstart(PoliLine *newPstart)
+{
+    pstart = newPstart;
+}
+
+
+PoliLine *MapControlPoint::getPfinish() const
+{
+    return pfinish;
+}
+
+void MapControlPoint::setPfinish(PoliLine *newPfinish)
+{
+    pfinish = newPfinish;
 }
 
 int MapControlPoint::getPointNum() const

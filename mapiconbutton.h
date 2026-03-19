@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QMouseEvent>
+#include "logger.h"
 
 namespace Ui {
 class MapIconButton;
@@ -44,6 +45,8 @@ public:
 
     void setIndex(int newIndex);
 
+    void setLogger(Logger *newLogger);
+
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
@@ -62,6 +65,8 @@ private:
     int pixSize = 0;
 
     int index = -1;
+
+    Logger* logger;
 
 };
 

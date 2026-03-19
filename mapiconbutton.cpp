@@ -2,6 +2,7 @@
 #include "ui_mapiconbutton.h"
 #include <QDebug>
 #include <QMenu>
+#include <QFile>
 
 MapIconButton::MapIconButton(QWidget *parent)
     : QFrame(parent)
@@ -55,6 +56,8 @@ void MapIconButton::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *selectedAction = menu.exec(event->globalPos());
     if(selectedAction == deleteAction){
+        QFile::remove(this->origingPath);
+        QFile::remove(this->prevPath);
         this->deleteLater();
         emit deleteMap(index);
     }else if(selectedAction == readyAction ) {
@@ -62,10 +65,18 @@ void MapIconButton::contextMenuEvent(QContextMenuEvent *event)
     }
 }
 
+void MapIconButton::setLogger(Logger *newLogger)
+{
+    logger = newLogger;
+}
+
+
+
 void MapIconButton::setIndex(int newIndex)
 {
     index = newIndex;
 }
+
 
 QString MapIconButton::getPrevPath() const
 {

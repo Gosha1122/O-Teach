@@ -54,6 +54,7 @@ MapSettings::MapSettings(QWidget *parent)
     pointsLine->hide();
 
     this->setStyleSheet(StyleHelper::getMapSettingsStyle());
+    ui->metrsSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
 }
 
 MapSettings::~MapSettings()
@@ -179,7 +180,7 @@ void MapSettings::on_pushButton_6_clicked()
         }
     }
     qDebug() << dirPath;
-    QString filename = "map" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss");
+    QString filename = "map" + QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss");
 
     qDebug() << originPath << prevPath;
 

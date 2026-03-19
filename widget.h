@@ -5,6 +5,7 @@
 #include "mapscene.h"
 #include "defines.h"
 #include <QCloseEvent>
+#include "logger.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -55,15 +56,21 @@ private:
     QGridLayout* grid;
     int countMaps = 0;
     QList<MapIconButton*> maps;
+    int currentMap = -1;
 
     MapApl::ToolType toolMode = MapApl::ToolType::Move;
 
     bool endPathButtonHide = true;
+    bool endPathMode = true;
+    bool endRulerMode = true;
+
 
     void settingsInit();
     void getSaveMapInit();
     void saveMaps();
     void setRulerMode();
+
+    Logger* logger;
 
 };
 #endif // WIDGET_H

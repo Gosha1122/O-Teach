@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     linerpoint.cpp \
+    logger.cpp \
     main.cpp \
     mapcontrolpoint.cpp \
     mapcropborderitem.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
 HEADERS += \
     defines.h \
     linerpoint.h \
+    logger.h \
     mapcontrolpoint.h \
     mapcropborderitem.h \
     mapiconbutton.h \

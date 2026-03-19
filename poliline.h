@@ -12,16 +12,19 @@ public:
     explicit PoliLine(QObject *parent = nullptr);
     void setPath(QPainterPath& path);
 
-    MapControlPoint *getStartPoint() const;
+    MapControlPoint *getStartPoint();
     void setStartPoint(MapControlPoint *newStartPoint);
 
-    MapControlPoint *getFinishPoint() const;
+    MapControlPoint *getFinishPoint();
     void setFinishPoint(MapControlPoint *newFinishPoint);
 
     QPointF getEndPoint() const;
     void setEndPoint(QPointF newEndPoint);
 
     qreal calculateDistance();
+    QGraphicsSimpleTextItem *getText();
+    void setText(QGraphicsSimpleTextItem *newText);
+
 signals:
 
 private:
@@ -30,6 +33,8 @@ private:
     QPointF endPoint;
     qreal distance = -1;
     qreal scaleMap = 1;
+
+    QGraphicsSimpleTextItem* text;
 };
 
 #endif // POLILINE_H

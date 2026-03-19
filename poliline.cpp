@@ -10,7 +10,7 @@ void PoliLine::setPath(QPainterPath &path)
     QGraphicsPathItem::setPath(path);
 }
 
-MapControlPoint *PoliLine::getStartPoint() const
+MapControlPoint *PoliLine::getStartPoint()
 {
     return startPoint;
 }
@@ -20,7 +20,7 @@ void PoliLine::setStartPoint(MapControlPoint *newStartPoint)
     startPoint = newStartPoint;
 }
 
-MapControlPoint *PoliLine::getFinishPoint() const
+MapControlPoint *PoliLine::getFinishPoint()
 {
     return finishPoint;
 }
@@ -52,4 +52,14 @@ qreal PoliLine::calculateDistance()
     dist *= scaleMap;
     distance = dist;
     return dist;
+}
+
+QGraphicsSimpleTextItem *PoliLine::getText()
+{
+    return text;
+}
+
+void PoliLine::setText(QGraphicsSimpleTextItem *newText)
+{
+    text = newText;
 }

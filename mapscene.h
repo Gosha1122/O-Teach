@@ -5,6 +5,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QTreeWidget>
+#include "logger.h"
+
 class MapControlPoint;
 class PoliLine;
 class QGraphicsSimpleTextItem;
@@ -55,6 +57,7 @@ public:
     bool itemContextMenuFlag = false;
     void setFinishPointFlag(bool newFinishPointFlag);
 
+    void startRulerModeStart();
     void startRulerMode(MapControlPoint* mp);
     void finishRulerMode();
 
@@ -65,6 +68,8 @@ public:
     void endRuler();
 
     void setStatistic(QTreeWidget *newStatistic);
+
+    void setLogger(Logger *newLogger);
 
 private slots:
     void removeMapPointSlot(MapControlPoint* point);
@@ -121,6 +126,8 @@ protected:
     QTreeWidget* statistic;
 
     void deletePointTreeWidget(int num);
+
+    Logger* logger;
 };
 
 #endif // MAPSCENE_H

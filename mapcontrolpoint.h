@@ -8,8 +8,9 @@
 #include <QDebug>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
+#include "logger.h"
 
-
+class PoliLine;
 class MapScene;
 class MapLineKP;
 class QGraphicsSimpleTextItem;
@@ -55,6 +56,14 @@ public:
     int getPointNum() const;
     void setPointNum(int newPointNum);
 
+    PoliLine *getPfinish() const;
+    void setPfinish(PoliLine *newPfinish);
+
+    PoliLine *getPstart() const;
+    void setPstart(PoliLine *newPstart);
+
+    void setLogger(Logger *newLogger);
+
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -98,6 +107,11 @@ private:
     QGraphicsSimpleTextItem* number;
 
     int pointNum;
+
+    PoliLine* pfinish = nullptr;
+    PoliLine* pstart = nullptr;
+
+    Logger* logger;
 };
 
 

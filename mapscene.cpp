@@ -5,6 +5,7 @@
 #include <QMenu>
 #include "maplinekp.h"
 #include <QGraphicsSimpleTextItem>
+#include <QFile>
 
 MapScene::MapScene(QObject *parent)
     : QGraphicsScene{parent}
@@ -18,6 +19,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         if(currentToolType==ToolType::Path){
             MapControlPoint* point = new MapControlPoint;
             point->setObjectName("Point");
+            point->setLogger(logger);
             if(!startPointFlag && !finishPointFlag){
                 qDebug() << "Start";
                 startPointFlag = true;
@@ -204,6 +206,11 @@ void MapScene::deletePointTreeWidget(int num)
     }
 }
 
+void MapScene::setLogger(Logger *newLogger)
+{
+    logger = newLogger;
+}
+
 void MapScene::setStatistic(QTreeWidget *newStatistic)
 {
     statistic = newStatistic;
@@ -247,13 +254,32 @@ void MapScene::setFinishPointFlag(bool newFinishPointFlag)
     finishPointFlag = newFinishPointFlag;
 }
 
-void MapScene::startRulerMode(MapControlPoint *mp)
+void MapScene::startRulerModeStart()
 {
-
-
     for(int i = 0; i < polilineVec.count(); i++){
         polilineVec[i]->show();
     }
+
+    QList<QGraphicsItem*> lst = this->items();
+    for(int i = 0; i < lst.count(); i++){
+        if(lst[i] == mapItem){
+            continue;
+        }
+        if(lst[i]->parentItem() != nullptr){
+            lst[i]->show();
+            continue;
+        }
+        MapControlPoint* item = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
+        if(item->objectName() == "Line"){
+            MapLineKP* line = qgraphicsitem_cast<MapLineKP*>(lst[i]);
+            line->hide();
+        }
+    }
+
+}
+
+void MapScene::startRulerMode(MapControlPoint *mp)
+{
 
     poliline = new PoliLine;
     QPainterPath new_path;
@@ -306,6 +332,8 @@ void MapScene::finishRulerMode()
     QPointF lastPoint = poliline->getEndPoint();
     qDebug() << lastPoint;
     qDebug() << poliline->getStartPoint()->scenePos();
+    poliline->getStartPoint()->setPstart(poliline);
+    poliline->getFinishPoint()->setPfinish(poliline);
     if(qPow(qAbs(lastPoint.x() - poliline->getFinishPoint()->scenePos().x()), 2) +
         qPow(qAbs(lastPoint.y() - poliline->getFinishPoint()->scenePos().y()), 2) <=
         KPSize * KPSize  / 4 && poliline != nullptr){
@@ -324,6 +352,8 @@ void MapScene::finishRulerMode()
         textItem->setFont(font);
         textItem->setBrush(QBrush(KPNumColor));
         textItem->setText(QString::number(static_cast<int>(poliline->calculateDistance())));
+
+        poliline->setText(textItem);
 
         polilineTextvec.push_back(textItem);
 
