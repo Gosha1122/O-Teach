@@ -526,10 +526,13 @@ void Widget::addNewMapButtonSlot()
 void Widget::deleteMapButtonSlot(int index)
 {
     maps.remove(index);
+    --countMaps;
 }
 
 void Widget::endButtonRulerSlot()
 {
+    logger->message("Start end Button Slot", Fatal::Debug);
+
     endRulerButton->hide();
     endRulerMode = true;
     if(!endPathButtonHide){
@@ -538,10 +541,13 @@ void Widget::endButtonRulerSlot()
     mapScene->endRuler();
     ui->moveButton->click();
 
+    logger->message("Finish end Button Slot", Fatal::Debug);
 }
 
 void Widget::settingsInit()
 {
+    logger->message("Start Color Init", Fatal::Debug);
+
     QColor allColor;
     allColor.setNamedColor(QString("#8e2cff"));
     //Номера КП
@@ -583,10 +589,13 @@ void Widget::settingsInit()
     ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
     mapScene->setLineColor(allColor);
 
+    logger->message("Finish Color Init", Fatal::Debug);
 }
 
 void Widget::getSaveMapInit()
 {
+    logger->message("Start Init SaveMap", Fatal::Debug);
+
     QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString path = dataPath + "/savemap.xml";
     QFile saveMapFile(path);
@@ -674,10 +683,13 @@ void Widget::getSaveMapInit()
     qDebug() << map;
     file.close();
     */
+
+    logger->message("Finish Init SaveMap", Fatal::Debug);
 }
 
 void Widget::saveMaps()
 {
+    logger->message("Start SaveMaps", Fatal::Debug);
     /*
     QFile output("exmample.xml");
     output.open(QIODevice::WriteOnly |QIODevice::Text);
@@ -733,6 +745,7 @@ void Widget::saveMaps()
     output.writeEndDocument();
     saveMapFile.close();
 
+    logger->message("Finish SaveMaps", Fatal::Debug);
 }
 
 void Widget::setRulerMode()

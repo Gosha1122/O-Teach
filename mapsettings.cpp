@@ -89,11 +89,8 @@ void MapSettings::on_addButton_clicked()
         return;
     }
     ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_2.png"));
-    originImg = new QPixmap;
-    QString path = ui->pathEdit->text().trimmed();
-    originPath = path;
-    if(originImg->load(path)){
-        pixMapItem = new QGraphicsPixmapItem(QPixmap(path));
+    if(originImg->load(originPath)){
+        pixMapItem = new QGraphicsPixmapItem(QPixmap(originPath));
         pixMapItem->setFlags(QGraphicsItem::ItemIsMovable);
         cropScene->addItem(pixMapItem);
         pixMapItem->setZValue(cropItem->zValue()-1);
@@ -119,6 +116,22 @@ void MapSettings::on_selectButton_clicked()
         return;
     }
     ui->pathEdit->setText(path);
+    originPath = path;
+
+    QProcess process;
+    QStringList args;
+    QFileInfo info(originPath);
+    args << originPath << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +"/maps/map" + QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss") + ".jpg";
+    process.start("magick.exe", args);
+    if(!process.waitForStarted() || !process.waitForFinished()){
+        qDebug() << "Error start";
+        return;
+    }
+    originPath = args[1];
+
+    originImg = new QPixmap(originPath);
+
+    qDebug() << originPath;
 }
 
 
@@ -187,13 +200,13 @@ void MapSettings::on_pushButton_6_clicked()
     QProcess process;
     QStringList args;
     QFileInfo info(originPath);
-    args << originPath << dirPath + "/" + filename + ".jpg";
-    process.start("magick.exe", args);
-    if(!process.waitForStarted() || !process.waitForFinished()){
-        qDebug() << "Error start";
-        return;
-    }
-    originPath = args[1];
+    // args << originPath << dirPath + "/" + filename + ".jpg";
+    // process.start("magick.exe", args);
+    // if(!process.waitForStarted() || !process.waitForFinished()){
+    //     qDebug() << "Error start";
+    //     return;
+    // }
+    // originPath = args[1];
 
     info.setFile(prevPath);
     args.clear();
