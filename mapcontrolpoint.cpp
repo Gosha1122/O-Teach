@@ -56,6 +56,7 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
             qDebug() << R;
             qDebug() << cos_a;
             qDebug() << sin_a;
+            qDebug() << "}";
             */
             /*
             QPoint new_p1(static_cast<int>(p1.x() * qCos(a_g) - p1.y() * qSin(a_g)), static_cast<int>(p1.x() * qSin(a_g) + p1.y() * qCos(a_g)));
@@ -157,11 +158,15 @@ void MapControlPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             */
             if(startLine != nullptr){
                 startLine->setRKP(KPSize / 2);
-                startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), oldPos.x(), oldPos.y());
+                if(startLine->getStartPoint().x() != oldPos.x() || startLine->getStartPoint().y() != oldPos.y()){
+                    startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), oldPos.x(), oldPos.y());
+                }
             }
             if(finishLine != nullptr){
                 finishLine->setRKP(KPSize / 2);
-                finishLine->setKPLine(oldPos.x(), oldPos.y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+                if(finishLine->getFinishPoint().x() != oldPos.x() || finishLine->getFinishPoint().y() != oldPos.y()){
+                    finishLine->setKPLine(oldPos.x(), oldPos.y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+                }
             }
             if(pfinish != nullptr){
                 QPainterPath path = pfinish->path();
@@ -188,10 +193,14 @@ void MapControlPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if(event->button()==Qt::LeftButton){
         leftButtonPresed = false;
         if(startLine != nullptr){
-            startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), this->scenePos().x(), this->scenePos().y());
+            if(startLine->getStartPoint().x() != this->scenePos().x() || startLine->getStartPoint().y() != this->scenePos().y()){
+                startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), this->scenePos().x(), this->scenePos().y());
+            }
         }
         if(finishLine != nullptr){
-            finishLine->setKPLine(this->scenePos().x(), this->scenePos().y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+            if(finishLine->getFinishPoint().x() != this->scenePos().x() || finishLine->getFinishPoint().y() != this->scenePos().y()){
+                finishLine->setKPLine(this->scenePos().x(), this->scenePos().y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+            }
         }
     }
     QGraphicsItem::mouseReleaseEvent(event);
@@ -210,12 +219,6 @@ QPoint MapControlPoint::minPoint(QPoint p1, QPoint p2, QPoint p3)
         return p1;
     }
 }
-
-void MapControlPoint::setLogger(Logger *newLogger)
-{
-    logger = newLogger;
-}
-
 
 PoliLine *MapControlPoint::getPstart() const
 {

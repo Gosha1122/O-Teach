@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGraphicsPathItem>
 #include "mapcontrolpoint.h"
+#include "distansesrtm.h"
 
 class PoliLine : public QObject, public QGraphicsPathItem
 {
@@ -25,6 +26,12 @@ public:
     QGraphicsSimpleTextItem *getText();
     void setText(QGraphicsSimpleTextItem *newText);
 
+    void setSrtm(DistanseSrtm *newSrtm);
+
+    void setLongetude_lt_currentMap(qreal newLongetude_lt_currentMap);
+
+    void setLatitude_lt_currentMap(qreal newLatitude_lt_currentMap);
+
 signals:
 
 private:
@@ -34,7 +41,12 @@ private:
     qreal distance = -1;
     qreal scaleMap = 1;
 
+    qreal longetude_lt_currentMap = 0;
+    qreal latitude_lt_currentMap  = 0;
+
     QGraphicsSimpleTextItem* text;
+
+    DistanseSrtm* srtm;
 };
 
 #endif // POLILINE_H

@@ -17,7 +17,7 @@ MapIconButton::~MapIconButton()
     delete ui;
 }
 
-void MapIconButton::setData(QString title, QString description, QString originPath, QString prevPath, int size, int pixSize)
+void MapIconButton::setData(QString title, QString description, QString originPath, QString prevPath, int size, int pixSize, qreal longetude, qreal latitude, QString srtmPath)
 {
     this->title = title;
     this->description = description;
@@ -27,11 +27,14 @@ void MapIconButton::setData(QString title, QString description, QString originPa
     this->pixSize = pixSize;
     ui->imageLabel->setPixmap(QPixmap(prevPath));
     ui->headerLabel->setText(title);
+    this->longetude_lt = longetude;
+    this->latitude_lt  = latitude;
+    this->srtmPath = srtmPath;
 }
 
 bool MapIconButton::isNormal()
 {
-    return !(title == "" && description == "" && origingPath == "" && prevPath == "" && sz == 0 && pixSize == 0);
+    return !(title == "" && description == "" && origingPath == "" && prevPath == "" && sz == 0 && pixSize == 0 && longetude_lt == 0 && latitude_lt == 0);
 }
 
 void MapIconButton::mousePressEvent(QMouseEvent *event)
@@ -65,11 +68,35 @@ void MapIconButton::contextMenuEvent(QContextMenuEvent *event)
     }
 }
 
-void MapIconButton::setLogger(Logger *newLogger)
+void MapIconButton::setSrtmPath(const QString &newSrtmPath)
 {
-    logger = newLogger;
+    srtmPath = newSrtmPath;
 }
 
+void MapIconButton::setLatitude_lt(qreal newLatitude_lt)
+{
+    latitude_lt = newLatitude_lt;
+}
+
+void MapIconButton::setLongetude_lt(qreal newLongetude_lt)
+{
+    longetude_lt = newLongetude_lt;
+}
+
+qreal MapIconButton::getLatitude_lt() const
+{
+    return latitude_lt;
+}
+
+qreal MapIconButton::getLongetude_lt() const
+{
+    return longetude_lt;
+}
+
+QString MapIconButton::getSrtmPath() const
+{
+    return srtmPath;
+}
 
 
 void MapIconButton::setIndex(int newIndex)

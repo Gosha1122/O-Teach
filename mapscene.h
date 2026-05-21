@@ -6,6 +6,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QTreeWidget>
 #include "logger.h"
+#include "distansesrtm.h"
 
 class MapControlPoint;
 class PoliLine;
@@ -69,7 +70,13 @@ public:
 
     void setStatistic(QTreeWidget *newStatistic);
 
-    void setLogger(Logger *newLogger);
+    qreal getLongetude_lt_currentMap() const;
+
+    qreal getLatitude_lt_currentMap() const;
+
+    void setCoordination(qreal longetude, qreal latitude);
+
+    void setSrtm_currentMap(DistanseSrtm *newSrtm_currentMap);
 
 private slots:
     void removeMapPointSlot(MapControlPoint* point);
@@ -127,7 +134,10 @@ protected:
 
     void deletePointTreeWidget(int num);
 
-    Logger* logger;
+    qreal longetude_lt_currentMap = 0;
+    qreal latitude_lt_currentMap  = 0;
+
+    DistanseSrtm* srtm_currentMap;
 };
 
 #endif // MAPSCENE_H

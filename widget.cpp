@@ -44,9 +44,9 @@ Widget::Widget(QWidget *parent)
         setGeometry(rect.width()/2-w/2, rect.height()/2-h/2, w, h);
     }
 
-    logger = new Logger;
-    logger->setLogPath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/logs/log_" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss") + ".log");
-    logger->message("Start work", Fatal::Message::Debug);
+
+    Logger::getInstance(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/logs/log_" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss") + ".log");
+    Logger::getInstance().message("Start work", Fatal::Message::Debug);
 
 
     StyleHelper::setFonts();
@@ -66,10 +66,12 @@ Widget::Widget(QWidget *parent)
     connect(ui->moveButton, &QToolButton::clicked, this, &Widget::changCurrentToolSlot);
     currentTool = nullptr;
 
+    srtm = new DistanseSrtm;
+
     mapScene = new MapScene(this);
     mapScene->setBackgroundBrush(QColor(200,200,210));
     ui->mapView->setScene(mapScene);
-    mapScene->setLogger(logger);
+    mapScene->setSrtm_currentMap(srtm);
 
     QPixmap pix(":/resourses/maps/map5.jpg");
     QGraphicsPixmapItem* imageItem = new QGraphicsPixmapItem(pix);
@@ -209,8 +211,7 @@ void Widget::closeEvent(QCloseEvent *event)
     settings.setValue("window/width",width());
     saveMaps();
 
-    logger->message("Close program", Fatal::Message::Debug);
-    logger->closeFile();
+    Logger::getInstance().message("Close program", Fatal::Message::Debug);
 }
 
 void Widget::changCurrentToolSlot()
@@ -245,7 +246,7 @@ void Widget::changCurrentToolSlot()
 
     switch (type) {
     case MapIcons::Move:
-        logger->message("Start select move mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Start select move mode", Fatal::Message::Debug);
 
         toolMode = MapApl::ToolType::Move;
 
@@ -255,11 +256,11 @@ void Widget::changCurrentToolSlot()
         ui->mapView->setDragMode(QGraphicsView::ScrollHandDrag);
         mapScene->setCurrentToolType(MapScene::ToolType::Move);
 
-        logger->message("Finish select move mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Finish select move mode", Fatal::Message::Debug);
         break;
     case MapIcons::Path:
 
-        logger->message("Start select path mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Start select path mode", Fatal::Message::Debug);
 
         toolMode = MapApl::ToolType::Path;
 
@@ -269,11 +270,11 @@ void Widget::changCurrentToolSlot()
         ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Path);
 
-        logger->message("Finish select move mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Finish select move mode", Fatal::Message::Debug);
         break;
     case MapIcons::Ruler:
 
-        logger->message("Start select ruler mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Start select ruler mode", Fatal::Message::Debug);
 
         toolMode = MapApl::ToolType::Ruler;
 
@@ -289,11 +290,11 @@ void Widget::changCurrentToolSlot()
 
         endRulerMode = false;
 
-        logger->message("Finish select ruler mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Finish select ruler mode", Fatal::Message::Debug);
         break;
 
     default:
-        logger->message("Start select default mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Start select default mode", Fatal::Message::Debug);
 
         ui->mapView->setToolCursor(Cursors::ToolCursor::Default);
 
@@ -301,7 +302,7 @@ void Widget::changCurrentToolSlot()
         ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Default);
 
-        logger->message("Finish select default mode", Fatal::Message::Debug);
+        Logger::getInstance().message("Finish select default mode", Fatal::Message::Debug);
     }
 
 
@@ -310,7 +311,7 @@ void Widget::changCurrentToolSlot()
 
 void Widget::scaleSceneSlot()
 {
-    logger->message("Start scale(button) scene", Fatal::Message::Debug);
+    Logger::getInstance().message("Start scale(button) scene", Fatal::Message::Debug);
 
     if(sender()->objectName()=="plusButton"){
         if(mapSizeValue >= 200){
@@ -335,7 +336,7 @@ void Widget::scaleSceneSlot()
 
     ui->zoomValueLabel->setText(QString::number(static_cast<int>(scale * 100)) + "%");
 
-    logger->message("Finish scale(button) scene", Fatal::Message::Debug);
+    Logger::getInstance().message("Finish scale(button) scene", Fatal::Message::Debug);
 }
 
 void Widget::ColorButtonSlot()
@@ -430,12 +431,15 @@ void Widget:: openMapSlot()
     QString originPath = btn->getOrigingPath();
     QPixmap pix(originPath);
     QGraphicsPixmapItem* imageItem = new QGraphicsPixmapItem(pix);
+    srtm->initMatrix(btn->getSrtmPath());
 
     ui->mapView->setSceneRect(0,0,pix.width(), pix.height());
     QGraphicsItem* item = mapScene->getMapItem();
     mapScene->removeItem(item);
     mapScene->setMapItem(imageItem);
     mapScene->addItem(imageItem);
+    mapScene->setCoordination(btn->getLongetude_lt(), btn->getLatitude_lt());
+    srtm->initMatrix(btn->getSrtmPath());
     imageItem->setZValue(-1);
     mapSizeValue = 100;
     QTransform matrix;
@@ -512,14 +516,13 @@ void Widget::addNewMapButtonSlot()
         iconBtn->setFixedSize(320,280);
         QString originPath = dlg.getOriginPath();
         QString prevPath = dlg.getPrevPath();
-        iconBtn->setData(dlg.getTitle(), dlg.getDescription(), originPath, prevPath, dlg.getSz(), dlg.getPixSize());
+        iconBtn->setData(dlg.getTitle(), dlg.getDescription(), originPath, prevPath, dlg.getSz(), dlg.getPixSize(), dlg.getX_0(), dlg.getY_0(), dlg.getSrtmPath());
         qDebug() <<  "count=" << grid->count();
         iconBtn->setIndex(countMaps);
         maps.push_back(iconBtn);
         grid->addWidget(iconBtn, (countMaps - countMaps % 5) / 5, countMaps % 5);
         connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
         ++countMaps;
-        iconBtn->setLogger(logger);
     }
 }
 
@@ -531,7 +534,7 @@ void Widget::deleteMapButtonSlot(int index)
 
 void Widget::endButtonRulerSlot()
 {
-    logger->message("Start end Button Slot", Fatal::Debug);
+    Logger::getInstance().message("Start end Button Slot", Fatal::Debug);
 
     endRulerButton->hide();
     endRulerMode = true;
@@ -541,12 +544,12 @@ void Widget::endButtonRulerSlot()
     mapScene->endRuler();
     ui->moveButton->click();
 
-    logger->message("Finish end Button Slot", Fatal::Debug);
+    Logger::getInstance().message("Finish end Button Slot", Fatal::Debug);
 }
 
 void Widget::settingsInit()
 {
-    logger->message("Start Color Init", Fatal::Debug);
+    Logger::getInstance().message("Start Color Init", Fatal::Debug);
 
     QColor allColor;
     allColor.setNamedColor(QString("#8e2cff"));
@@ -589,12 +592,12 @@ void Widget::settingsInit()
     ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#8e2cff"));
     mapScene->setLineColor(allColor);
 
-    logger->message("Finish Color Init", Fatal::Debug);
+    Logger::getInstance().message("Finish Color Init", Fatal::Debug);
 }
 
 void Widget::getSaveMapInit()
 {
-    logger->message("Start Init SaveMap", Fatal::Debug);
+    Logger::getInstance().message("Start Init SaveMap", Fatal::Debug);
 
     QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString path = dataPath + "/savemap.xml";
@@ -619,7 +622,6 @@ void Widget::getSaveMapInit()
                     map->setIndex(countMaps);
                     ++countMaps;
                     maps.push_back(map);
-                    map->setLogger(logger);
                 }else{
                     delete map;
                 }
@@ -638,6 +640,12 @@ void Widget::getSaveMapInit()
                 map->setPixSize(reader.readElementText().toInt());
             }else if(t == "description"){
                 map->setDescription(reader.readElementText());
+            }else if(t == "longetude"){
+                map->setLongetude_lt(reader.readElementText().toDouble());
+            }else if(t == "latitude"){
+                map->setLatitude_lt(reader.readElementText().toDouble());
+            }else if(t == "srtmPath"){
+                map->setSrtmPath(reader.readElementText());
             }
         }
         reader.readNext();
@@ -649,7 +657,6 @@ void Widget::getSaveMapInit()
         map->setIndex(countMaps);
         ++countMaps;
         maps.push_back(map);
-        map->setLogger(logger);
     }else{
         delete map;
     }
@@ -684,12 +691,12 @@ void Widget::getSaveMapInit()
     file.close();
     */
 
-    logger->message("Finish Init SaveMap", Fatal::Debug);
+    Logger::getInstance().message("Finish Init SaveMap", Fatal::Debug);
 }
 
 void Widget::saveMaps()
 {
-    logger->message("Start SaveMaps", Fatal::Debug);
+    Logger::getInstance().message("Start SaveMaps", Fatal::Debug);
     /*
     QFile output("exmample.xml");
     output.open(QIODevice::WriteOnly |QIODevice::Text);
@@ -739,13 +746,16 @@ void Widget::saveMaps()
         output.writeTextElement("size", QString::number(map->getSz()));
         output.writeTextElement("scale", QString::number(map->getPixSize()));
         output.writeTextElement("description", map->getDescription());
+        output.writeTextElement("longetude", QString::number(map->getLongetude_lt()));
+        output.writeTextElement("latitude", QString::number(map->getLatitude_lt()));
+        output.writeTextElement("srtmPath", map->getSrtmPath());
         output.writeEndElement();
     }
     output.writeEndElement();
     output.writeEndDocument();
     saveMapFile.close();
 
-    logger->message("Finish SaveMaps", Fatal::Debug);
+    Logger::getInstance().message("Finish SaveMaps", Fatal::Debug);
 }
 
 void Widget::setRulerMode()

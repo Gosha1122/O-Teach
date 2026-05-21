@@ -2,23 +2,9 @@
 #include <QTextStream>
 #include <QDateTime>
 
-Logger::Logger(QObject *parent)
-    : QObject{parent}
-{}
-
 QString Logger::getLogPath() const
 {
     return logPath;
-}
-
-void Logger::setLogPath(const QString &newLogPath)
-{
-    logPath = newLogPath;
-    logFile.setFileName(logPath);
-    logFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    logTextStream = new QTextStream(&logFile);
-    qDebug() << newLogPath;
-
 }
 
 void Logger::message(QString msg, Fatal::Message type)
@@ -36,7 +22,18 @@ void Logger::message(QString msg, Fatal::Message type)
     (*logTextStream) << txt << "\n";
 }
 
-void Logger::closeFile()
+
+
+Logger &Logger::getInstance(QString path)
 {
+    static Logger instance(path);
+    return instance;
+}
+
+Logger::Logger(QString path):logPath(path), logFile(path){
+    logTextStream = new QTextStream(&logFile);
+}
+
+Logger::~Logger(){
     logFile.close();
 }

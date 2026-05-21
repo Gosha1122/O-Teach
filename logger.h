@@ -1,22 +1,22 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <QObject>
+
 #include "defines.h"
 #include <QFile>
 
-class Logger : public QObject
+class Logger
 {
-    Q_OBJECT
+
 public:
-    explicit Logger(QObject *parent = nullptr);
+    Logger(const Logger&) = delete;
+    Logger& operator= (const Logger&) = delete;
 
     QString getLogPath() const;
-    void setLogPath(const QString &newLogPath);
 
     void message(QString msg, Fatal::Message type);
 
-    void closeFile();
+    static Logger& getInstance(QString path = "");
 
 signals:
 
@@ -25,6 +25,9 @@ private:
     QTextStream* logTextStream;
 
     QFile logFile;
+
+    Logger(QString path);
+    ~Logger();
 
 };
 

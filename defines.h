@@ -1,5 +1,6 @@
 #ifndef DEFINES_H
 #define DEFINES_H
+
 namespace MapApl
 {
 
@@ -46,4 +47,5 @@ enum Message{
 };
 
 };
+
 #endif // DEFINES_H

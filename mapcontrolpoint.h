@@ -62,8 +62,6 @@ public:
     PoliLine *getPstart() const;
     void setPstart(PoliLine *newPstart);
 
-    void setLogger(Logger *newLogger);
-
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -110,8 +108,6 @@ private:
 
     PoliLine* pfinish = nullptr;
     PoliLine* pstart = nullptr;
-
-    Logger* logger;
 };
 
 

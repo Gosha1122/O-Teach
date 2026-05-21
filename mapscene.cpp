@@ -19,7 +19,6 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         if(currentToolType==ToolType::Path){
             MapControlPoint* point = new MapControlPoint;
             point->setObjectName("Point");
-            point->setLogger(logger);
             if(!startPointFlag && !finishPointFlag){
                 qDebug() << "Start";
                 startPointFlag = true;
@@ -66,7 +65,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                     flagLastItemStart = false;
                     line->setFlagStartPoint(MapLineKP::StartPoint::beginStartPoint);
                     line->setRStart(StartSize / 2);
-                    qDebug() << StartSize;
+                    //qDebug() << StartSize;
                     lastItem->update();
                 }
                 line->setKPLine(oldPoint.x(), oldPoint.y(), event->scenePos().x(), event->scenePos().y());
@@ -206,9 +205,25 @@ void MapScene::deletePointTreeWidget(int num)
     }
 }
 
-void MapScene::setLogger(Logger *newLogger)
+void MapScene::setSrtm_currentMap(DistanseSrtm *newSrtm_currentMap)
 {
-    logger = newLogger;
+    srtm_currentMap = newSrtm_currentMap;
+}
+
+qreal MapScene::getLatitude_lt_currentMap() const
+{
+    return latitude_lt_currentMap;
+}
+
+void MapScene::setCoordination(qreal longetude, qreal latitude)
+{
+    longetude_lt_currentMap = longetude;
+    latitude_lt_currentMap  = latitude;
+}
+
+qreal MapScene::getLongetude_lt_currentMap() const
+{
+    return longetude_lt_currentMap;
 }
 
 void MapScene::setStatistic(QTreeWidget *newStatistic)
@@ -289,6 +304,9 @@ void MapScene::startRulerMode(MapControlPoint *mp)
     addItem(poliline);
     poliline->setEndPoint(mp->scenePos());
     poliline->setPen(QPen(LineColor, LineWidth));
+    poliline->setLatitude_lt_currentMap(latitude_lt_currentMap);
+    poliline->setLongetude_lt_currentMap(longetude_lt_currentMap);
+    poliline->setSrtm(srtm_currentMap);
 
     polilineVec.push_back(poliline);
 
@@ -346,6 +364,8 @@ void MapScene::finishRulerMode()
         //QPointF p((poliline->getFinishPoint()->pos().x() + poliline->getStartPoint()->pos().x()) / 2, (poliline->getFinishPoint()->pos().y() + poliline->getStartPoint()->pos().y()) / 2);
         QPointF p = getPointDistansTextPoliline(poliline);
 
+        qDebug() << "Point distance text set";
+
         textItem->setPos(p.x() - KPNumSize - 10, p.y() - KPNumSize - 10);
         QFont font = textItem->font();
         font.setPixelSize(KPNumSize * 2 / 3);
@@ -354,6 +374,7 @@ void MapScene::finishRulerMode()
         textItem->setText(QString::number(static_cast<int>(poliline->calculateDistance())));
 
         poliline->setText(textItem);
+        qDebug() << "Set text current poliline";
 
         polilineTextvec.push_back(textItem);
 
@@ -415,6 +436,7 @@ void MapScene::setFinishPoint()
     lastItem->getStartLine()->setRStart(StartSize / 2);
     lastItem->getStartLine()->updateKP();
     qDebug() << "count: "<< lastItem->childItems().count();
+    qDebug() << "Childs[0]: " << lastItem->childItems()[0];
     this->removeItem(lastItem->childItems()[0]);
     lastItem->update();
     statistic->topLevelItem(pointCount - 2)->setText(0, (QString::number(pointCount - 2) + "->" + "Финиш"));
@@ -500,7 +522,9 @@ void MapScene::removeMapPointSlot(MapControlPoint *point)
     }
     MapLineKP* line = new MapLineKP;
     line->setRKP(KPSize / 2);
-    line->setKPLine(beginPoint.x(), beginPoint.y(), endPoint.x(), endPoint.y());
+    if(beginPoint.x() != endPoint.x() || beginPoint.y() != endPoint.y()){
+        line->setKPLine(beginPoint.x(), beginPoint.y(), endPoint.x(), endPoint.y());
+    }
     QPen pen;
     pen.setColor(LineColor);
     pen.setWidth(LineWidth);

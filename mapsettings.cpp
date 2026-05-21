@@ -14,6 +14,8 @@
 #include <QScreen>
 #include <QIcon>
 #include <QProcess>
+#include "coordinationpoint.h"
+#include "coordinationscene.h"
 
 MapSettings::MapSettings(QWidget *parent)
     : QDialog(parent)
@@ -88,13 +90,14 @@ void MapSettings::on_addButton_clicked()
         msbox.exec();
         return;
     }
-    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_2.png"));
+    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_2.jpg"));
     if(originImg->load(originPath)){
         pixMapItem = new QGraphicsPixmapItem(QPixmap(originPath));
         pixMapItem->setFlags(QGraphicsItem::ItemIsMovable);
         cropScene->addItem(pixMapItem);
         pixMapItem->setZValue(cropItem->zValue()-1);
         ui->graphicsView->setCursor(Qt::SizeAllCursor);
+        srtmPath = ui->pathHeightsEdit->text();
 
     }
     ui->stackedWidget->setCurrentWidget(ui->page_2);
@@ -137,7 +140,7 @@ void MapSettings::on_selectButton_clicked()
 
 void MapSettings::on_pushButton_3_clicked()
 {
-    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_3.png"));
+    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_3.jpg"));
     ui->descriptionLabel->setText("Переместите точки, чтобы указать растояние");
     QPixmap pix;
     xPrev = (pixMapItem->x()<0)? abs(pixMapItem->x())+120: 120-pixMapItem->x();
@@ -223,7 +226,9 @@ void MapSettings::on_pushButton_6_clicked()
     if(!ui->lineEdit->text().trimmed().isEmpty()){
         pixSize = ui->lineEdit->text().trimmed().toInt();
     }
-    this->accept();
+    ui->stackedWidget->setCurrentWidget(ui->page_4);
+    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_4.jpg"));
+    initPage_4();
 
 }
 
@@ -277,5 +282,96 @@ void MapSettings::setTitle(const QString &newTitle)
     title = newTitle;
 }
 
+void MapSettings::on_pushButton_8_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->page_3);
+}
 
+
+void MapSettings::on_pushButton_7_clicked()
+{
+    QVector<CoordPoint>* points = pointsScene->getPoints();
+    int n = points->size();
+    qreal sum_x_longetude = 0;
+    qreal sum_x2_longetude = 0;
+    qreal sum_xy_longetude = 0;
+    qreal sum_y_longetude = 0;
+    qreal sum_x_latitude = 0;
+    qreal sum_x2_latitude = 0;
+    qreal sum_xy_latitude = 0;
+    qreal sum_y_latitude = 0;
+    for(int i = 0; i < n; i++){
+        CoordPoint p = points->at(i);
+        sum_x_longetude += p.x;
+        sum_y_longetude += p.x_0;
+        sum_x2_longetude += p.x * p.x;
+        sum_xy_longetude += p.x * p.x_0;
+
+        sum_x_latitude  += p.y;
+        sum_y_latitude  += p.y_0;
+        sum_x2_latitude += p.y * p.y;
+        sum_xy_latitude += p.y * p.y_0;
+    }
+    qreal x_longetude = sum_x_longetude / n;
+    qreal x2_longetude = sum_x2_longetude / n;
+    qreal y_longetude = sum_y_longetude / n;
+    qreal xy_longetude = sum_xy_longetude / n;
+
+    qreal x_latitude = sum_x_latitude / n;
+    qreal x2_latitude = sum_x2_latitude / n;
+    qreal y_latitude = sum_y_latitude / n;
+    qreal xy_latitude = sum_xy_latitude / n;
+
+    y_0 = (x2_latitude * y_latitude - x_latitude * xy_latitude) / (x2_latitude - x_latitude * x_latitude);
+    x_0 = (x2_longetude * y_longetude - x_longetude * xy_longetude) / (x2_longetude - x_longetude * x_longetude);
+    this->accept();
+}
+
+
+void MapSettings::on_pushButton_10_clicked()
+{
+    this->reject();
+}
+
+void MapSettings::initPage_4()
+{
+    pointsScene = new CoordinationScene;
+    pointsScene->setLatitudeEdit(ui->latitudeEdit);
+    pointsScene->setLongetudeEdit(ui->longitudeEdit);
+    pointsScene->addPixmap(QPixmap(originPath));
+    ui->graphicsView_3->setScene(pointsScene);
+    ui->graphicsView_3->setSceneRect(0, 0, QPixmap(originPath).rect().size().width(), QPixmap(originPath).rect().size().height());
+    //connect(ui->pushButton_11, &QPushButton::clicked, pointsScene, &CoordinationScene::applyButtonPressed);
+}
+
+QString MapSettings::getSrtmPath() const
+{
+    return srtmPath;
+}
+
+qreal MapSettings::getY_0() const
+{
+    return y_0;
+}
+
+qreal MapSettings::getX_0() const
+{
+    return x_0;
+}
+
+void MapSettings::on_pushButton_11_clicked()
+{
+    pointsScene->applyButtonPressed();
+}
+
+
+void MapSettings::on_selectButtonHeights_clicked()
+{
+    QString path = QFileDialog::getOpenFileName(this, "Выбор карты высот", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "Srtm(*.hgt)");
+    if(path.isEmpty()){
+        return;
+    }
+    ui->pathHeightsEdit->setText(path);
+    srtmPath = path;
+}
 

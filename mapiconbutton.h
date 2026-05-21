@@ -16,7 +16,7 @@ class MapIconButton : public QFrame
 public:
     explicit MapIconButton(QWidget *parent = nullptr);
     ~MapIconButton();
-    void setData(QString title, QString description, QString originPath, QString prevPath, int size, int pixSize);
+    void setData(QString title, QString description, QString originPath, QString prevPath, int size, int pixSize, qreal longetude, qreal latitude, QString srtmPath);
     bool isNormal();
 
     QString getTitle() const;
@@ -45,7 +45,17 @@ public:
 
     void setIndex(int newIndex);
 
-    void setLogger(Logger *newLogger);
+    QString getSrtmPath() const;
+
+    qreal getLongetude_lt() const;
+
+    qreal getLatitude_lt() const;
+
+    void setLongetude_lt(qreal newLongetude_lt);
+
+    void setLatitude_lt(qreal newLatitude_lt);
+
+    void setSrtmPath(const QString &newSrtmPath);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -61,12 +71,13 @@ private:
     QString description = "";
     QString origingPath = "";
     QString prevPath = "";
+    QString srtmPath = "";
     int sz = 0;
     int pixSize = 0;
+    qreal longetude_lt = 0;
+    qreal latitude_lt  = 0;
 
     int index = -1;
-
-    Logger* logger;
 
 };
 

@@ -67,5 +67,14 @@
         <file>resourses/maps/map3-s.png</file>
         <file>resourses/maps/map4-s.png</file>
         <file>resourses/icons/ico.png</file>
+        <file>resourses/icons/step_1_new.jpg</file>
+        <file>resourses/icons/step_2_new.jpg</file>
+        <file>resourses/icons/step_3_new.jpg</file>
+        <file>resourses/icons/step_4_new.jpg</file>
+        <file>resourses/icons/step_1_conv.jpg</file>
+        <file>resourses/icons/step_1.jpg</file>
+        <file>resourses/icons/step_2.jpg</file>
+        <file>resourses/icons/step_3.jpg</file>
+        <file>resourses/icons/step_4.jpg</file>
     </qresource>
 </RCC>

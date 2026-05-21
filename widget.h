@@ -6,6 +6,7 @@
 #include "defines.h"
 #include <QCloseEvent>
 #include "logger.h"
+#include "distansesrtm.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -57,6 +58,8 @@ private:
     int countMaps = 0;
     QList<MapIconButton*> maps;
     int currentMap = -1;
+    qreal x_0_currentMap = 0;
+    qreal y_0_currentMap = 0;
 
     MapApl::ToolType toolMode = MapApl::ToolType::Move;
 
@@ -70,7 +73,7 @@ private:
     void saveMaps();
     void setRulerMode();
 
-    Logger* logger;
+    DistanseSrtm* srtm;
 
 };
 #endif // WIDGET_H

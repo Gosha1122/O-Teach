@@ -9,6 +9,7 @@
 #include <QGraphicsLineItem>
 #include <QGraphicsSimpleTextItem>
 
+class CoordinationScene;
 namespace Ui {
 class MapSettings;
 }
@@ -41,6 +42,13 @@ public:
 
     int getPixSize() const;
 
+    qreal getX_0() const;
+
+
+    qreal getY_0() const;
+
+    QString getSrtmPath() const;
+
 private slots:
     void on_addButton_clicked();
     void on_cancellButton_clicked();
@@ -52,6 +60,16 @@ private slots:
     void on_pushButton_9_clicked();
 
     void on_pushButton_6_clicked();
+
+    void on_pushButton_8_clicked();
+
+    void on_pushButton_7_clicked();
+
+    void on_pushButton_10_clicked();
+
+    void on_pushButton_11_clicked();
+
+    void on_selectButtonHeights_clicked();
 
 private:
     Ui::MapSettings *ui;
@@ -77,6 +95,13 @@ private:
 
     int xPrev = 0;
     int yPrev = 0;
+
+    void initPage_4();
+    CoordinationScene* pointsScene;
+
+    qreal x_0;
+    qreal y_0;
+    QString srtmPath = "";
 };
 
 #endif // MAPSETTINGS_H
