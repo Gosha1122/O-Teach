@@ -7,6 +7,7 @@
 #include <QCloseEvent>
 #include "logger.h"
 #include "distansesrtm.h"
+#include "heightsimage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -44,6 +45,7 @@ private slots:
     void addNewMapButtonSlot();
     void deleteMapButtonSlot(int index);
     void endButtonRulerSlot();
+    void heightMapSlot();
 
 private:
     Ui::Widget*  ui;
@@ -60,6 +62,9 @@ private:
     int currentMap = -1;
     qreal x_0_currentMap = 0;
     qreal y_0_currentMap = 0;
+
+    HeightsImage* heightsImage;
+    bool isVisibleHeightsImage = false;
 
     MapApl::ToolType toolMode = MapApl::ToolType::Move;
 

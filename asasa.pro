@@ -12,6 +12,7 @@ SOURCES += \
     coordinationpoint.cpp \
     coordinationscene.cpp \
     distansesrtm.cpp \
+    heightsimage.cpp \
     linerpoint.cpp \
     logger.cpp \
     main.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     coordinationscene.h \
     defines.h \
     distansesrtm.h \
+    heightsimage.h \
     linerpoint.h \
     logger.h \
     mapcontrolpoint.h \

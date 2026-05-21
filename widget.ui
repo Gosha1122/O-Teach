@@ -33,7 +33,7 @@
    <item row="0" column="0">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="mapPage">
       <property name="styleSheet">
@@ -259,6 +259,28 @@
                 </property>
                 <property name="text">
                  <string>Сдвинуть</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextUnderIcon</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="heightMapButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>65</width>
+                  <height>55</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Карта высот</string>
                 </property>
                 <property name="iconSize">
                  <size>

@@ -6,6 +6,7 @@
 #include <QPixmap>
 
 #define NONEHEIGHT -32768
+#define MAXHEIGHT  8850
 
 class DistanseSrtm : public QObject
 {
@@ -19,6 +20,8 @@ public:
     int calculateDistance(int x1, int y1, int x2, int y2, qreal scaled, qreal x_0, qreal y_0);
 
     QVector<QVector<int> > *getHeights() const;
+
+    QImage *getImage() const;
 
 signals:
 

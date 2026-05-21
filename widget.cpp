@@ -20,6 +20,7 @@
 #include <QScreen>
 #include <QDateTime>
 #include <QTextStream>
+#include <QPixmap>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -194,6 +195,13 @@ Widget::Widget(QWidget *parent)
     connect(mapScene, &MapScene::startRulerModeSignal, this, &Widget::startRulerModeSlot);
 
     ui->TreeStatisticWidget->setStyleSheet(StyleHelper::getMapStatisticStyle());
+
+    heightsImage = new HeightsImage;
+    connect(ui->heightMapButton, &QToolButton::clicked, this, &Widget::heightMapSlot);
+    StyleHelper::setToolButtonStyleDark(ui->heightMapButton, StyleHelper::MapIconsType::Image,false);
+    mapScene->addItem(heightsImage);
+    heightsImage->setObjectName("Image");
+
 }
 
 Widget::~Widget()
@@ -405,6 +413,7 @@ void Widget::backButtonSlot()
     endPathButton->hide();
     endPathButtonHide = true;
     ui->stackedWidget->setCurrentWidget(ui->mapsListPage);
+    //mapScene->removeItem(heightsImage);
 }
 
 void Widget::endButtonPointSlot()
@@ -451,6 +460,8 @@ void Widget:: openMapSlot()
     ui->mapNameLabel->setText(btn->getTitle()+" 1:"+QString::number(btn->getSz()));
 
     if(!endPathMode) endPathButton->show();
+
+   // mapScene->addItem(heightsImage);
 }
 
 void Widget::SizeSpinBoxSlot(int value)
@@ -545,6 +556,29 @@ void Widget::endButtonRulerSlot()
     ui->moveButton->click();
 
     Logger::getInstance().message("Finish end Button Slot", Fatal::Debug);
+}
+
+void Widget::heightMapSlot()
+{
+    heightsImage->setPixmap(QPixmap::fromImage(*srtm->getImage()));
+    QList<QGraphicsItem*> lst = mapScene->items();
+    QGraphicsItem* image = qgraphicsitem_cast<QGraphicsItem*>(heightsImage);
+    for(auto& item: lst){
+        if(item != image){
+            if(!isVisibleHeightsImage){
+                item->hide();
+            }else{
+                item->show();
+            }
+        }else{
+            if(!isVisibleHeightsImage){
+                item->show();
+            }else{
+                item->hide();
+            }
+        }
+    }
+    isVisibleHeightsImage = !isVisibleHeightsImage;
 }
 
 void Widget::settingsInit()

@@ -33,7 +33,7 @@ void DistanseSrtm::initMatrix(QString path)
         heights = new QVector<QVector<int>>(n, QVector<int>(n, NONEHEIGHT));
         for(int r = 0; r < n; r++){
             for(int c = 0; c < n; c++){
-                int t = (data.at((r * (n+1) + c)  * 2) << 8) | (data.at((r * (n+1) + c) * 2 + 1));
+                int t = (data.at((r * (n + 1) + c) * 2) << 8) | (data.at((r * (n + 1) + c) * 2 + 1));
                 if (t == (*heights)[r][c]) {
                     if (c > 0) {
                         t = (*heights)[r][c-1];
@@ -95,4 +95,9 @@ int DistanseSrtm::calculateDistance(int x1, int y1, int x2, int y2, qreal scaled
 QVector<QVector<int> > *DistanseSrtm::getHeights() const
 {
     return heights;
+}
+
+QImage *DistanseSrtm::getImage() const
+{
+    return image;
 }

@@ -164,6 +164,9 @@ void StyleHelper::setToolButtonStyleDark(QToolButton* btn, MapIconsType type, bo
     case Add:
         url = active? ":/resourses/icons/green_plus.png" : ":/resourses/icons/gray_plus.png";
         break;
+    case Image:
+        url = ":/resourses/icons/heights-icon.png";
+        break;
     }
     QString bgColor;
     QString bgColorHover = "#2B3035";

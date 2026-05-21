@@ -12,7 +12,8 @@ public:
         Ruler,
         Start,
         Move,
-        Add
+        Add,
+        Image
     };
     StyleHelper();
 
